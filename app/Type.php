@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Application;
 use Illuminate\Database\Eloquent\Model;
 
 class Type extends Model
@@ -15,5 +16,10 @@ class Type extends Model
             ['name'=>'Kematian Keluarga','slug'=>'family_death','limit'=>'1'],
             ['name'=>'Haji dan Umrah','slug'=>'hajj_and_umra','limit'=>'1'],
         ];
+    }
+
+    public function application()
+    {
+        return $this->hasOne(Application::class);
     }
 }

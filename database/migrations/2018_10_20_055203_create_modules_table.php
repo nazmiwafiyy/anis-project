@@ -17,8 +17,6 @@ class CreateModulesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('display_name');
-            $table->string('icon')->default('mdi-extension');
-            $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });

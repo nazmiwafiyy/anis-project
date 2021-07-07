@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Profile;
 use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
@@ -34,5 +35,10 @@ class Department extends Model
             ['name'=>'PEJABAT TIMBALAN SETIAUSAHA KERAJAAN (PEMBANGUNAN)','description'=>'pejabat timbalan setiausaha kerajaan (pembangunan)'],
             ['name'=>'BAHAGIAN PENGURUSAN KEWANGAN','description'=>'bahagian pengurusan kewangan'],
         ];
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
     }
 }

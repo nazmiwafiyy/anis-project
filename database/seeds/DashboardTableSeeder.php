@@ -14,8 +14,7 @@ class DashboardTableSeeder extends Seeder
         // Module
         $moduleId = DB::table('modules')->insertGetId([
             'name' => 'dashboard',
-            'display_name' => 'Dashboard',
-            'icon' => 'icon-speedometer'
+            'display_name' => 'Papan Pemuka',
         ]);
     }
 }

@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Users;
 use Avatar;
 use App\User;
 
+use App\Profile;
 use Illuminate\Http\Request;
-use Yajra\DataTables\DataTables;
 
+use Yajra\DataTables\DataTables;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Html\Builder;
 use App\Http\Controllers\Controller;
@@ -39,7 +40,7 @@ class UserController extends Controller
                 ['targets' => 4,'width' => '15%','className' => 'text-center'],
             ],
             'language' => ['url' => url('//cdn.datatables.net/plug-ins/1.10.24/i18n/Malay.json')],
-            'order' => [3,'desc']
+            'order' => [3,'asc']
 
         ]);
 
@@ -65,7 +66,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = Role::pluck('name', 'id');
+        $roles = Role::pluck('display_name', 'id');
         
         return view('users.create',compact('roles'));
     }
@@ -94,7 +95,12 @@ class UserController extends Controller
 
             $avatar = Avatar::create($user->name)->getImageObject()->encode('png',100);
             Storage::disk('public')->put('avatars/'.$user->id.'/avatar.png', (string) $avatar);
-
+            
+            $profiledetails = [
+                'fullname' => $request->get('name'),
+                'user_id' => $user->id
+            ];
+            $profile = Profile::create($profiledetails);
             // Alert::toast('Pengguna baru berjaya dicipta.', 'success');
             Session::flash('success', 'Pengguna baru berjaya dicipta.');
 
@@ -109,7 +115,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findorFail($id);
-        $roles = Role::pluck('name', 'id');
+        $roles = Role::pluck('display_name', 'id');
         
         return view('users.edit',compact('user','roles'));
     }

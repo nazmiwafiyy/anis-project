@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Application;
 
 use App\File;
 use App\Type;
+use App\Approval;
 use App\Position;
 use App\Department;
 use App\Application;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Html\Builder;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class ApplicationController extends Controller
@@ -18,9 +22,58 @@ class ApplicationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request, Builder $builder)
     {
-        return view('application.index');
+        $html = $builder->columns([
+            ['data' => 'DT_RowIndex', 'name' => 'DT_RowIndex', 'title' => 'No','searchable' => false,'orderable' => false,],
+            ['data' => 'fullname', 'name' => 'user.profile.fullname', 'title' => 'Nama','searchable' => true,'orderable' => true,],
+            ['data' => 'type', 'name' => 'type.name', 'title' => 'Perkara','searchable' => true,'orderable' => true,],
+            ['data' => 'approval', 'name' => 'approval', 'title' => 'Kelulusan','searchable' => false,'orderable' => false,],
+            ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Dicipta pada','searchable' => false,'orderable' => true,],
+            ['data' => 'actions', 'name' => 'actions', 'title' => 'Tindakan','searchable' => false,'orderable' => false,],
+        ])
+        ->ajax(['url' => route('application.index'),'type' => 'GET','data' => 'function(d) { d.key = "value"; }'])
+        ->parameters([
+            'autoWidth' => false,
+            'columnDefs' => [
+                ['targets' => 0,'width' => '5%',],
+                ['targets' => 1,'width' => '35%','className' => ''],
+                ['targets' => 2,'width' => '15%','className' => ''],
+                ['targets' => 3,'width' => '15%','className' => ''],
+                ['targets' => 4,'width' => '15%','className' => ''],
+                ['targets' => 5,'width' => '15%','className' => 'text-center'],
+            ],
+            'language' => ['url' => url('//cdn.datatables.net/plug-ins/1.10.24/i18n/Malay.json')],
+            'order' => [4,'desc'],
+        ]);
+
+        if($request->ajax()){
+            $application = Application::with('user.profile','type');
+            // $application = Application::query();
+            return DataTables::of($application)
+                ->addIndexColumn()
+                ->addColumn('fullname', function(Application $application){ 
+                    return $application->user->profile->fullname;
+                })
+                ->addColumn('type', function(Application $application){  
+                    return $application->type->name;
+                })
+                ->addColumn('approval', function(Application $application){  
+                    $approval = 'Paras<small class="text-muted float-right"> 2 of 4</small>
+                        <div class="progress progress-xxs progress-bar-danger">
+                            <div class="progress-bar progress-bar-danger" style="width: 50%"></div>
+                        </div>';
+                    return $approval;
+                })
+                ->addColumn('actions', function(Application $application){  
+                    $data = ['entity' => 'application','id' => $application->id]; 
+                    return view('shared._actions',$data);
+                })
+                ->rawColumns(['approval','actions'])
+                ->toJson();
+        }
+
+        return view('application.index',compact('html'));
     }
 
     /**
@@ -85,8 +138,9 @@ class ApplicationController extends Controller
             'attemp.required_if' => 'Ruangan tuntutan diperlukan, sila pilih tuntutan',
             'relationship.required_if' => 'Ruangan hubungan keluarga diperlukan',
         ], $attributes);
-
-        if($application = Application::create($request->except('files'))) {
+        
+        $request->merge(['user_id' => $request->user()->id]);
+        if($application = Application::create($request->except('files','fullname','position_id','department_id','identity_no','phone_no'))) {
 
             foreach ($request->file('files') as $document) {
                 $fileName = time().'_'.$document->getClientOriginalName();
@@ -112,7 +166,9 @@ class ApplicationController extends Controller
      */
     public function show($id)
     {
-        //
+        $application = Application::findOrFail($id);
+        // dd($application->approvals->pluck('user_id'));
+        return view('application.show',compact('application'));
     }
 
     /**
@@ -147,5 +203,39 @@ class ApplicationController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function approve($id)
+    {
+        $application = Application::findorFail($id);
+        $approvalDetails = [
+            'application_id' => $application->id,
+            'user_id' => Auth::user()->id,
+            'status' => 1,
+        ];
+        if($approvals = Approval::create($approvalDetails)) {
+            Session::flash('success', 'Permohonan telah berjaya diluluskan.');
+        }else{
+            Session::flash('error', 'Permohonan tidak dapat diluluskan.');
+        }
+
+        return redirect()->back();
+    }
+
+    public function reject($id)
+    {
+        $application = Application::findorFail($id);
+        $approvalDetails = [
+            'application_id' => $application->id,
+            'user_id' => Auth::user()->id,
+            'status' => 0,
+        ];
+        if($approvals = Approval::create($approvalDetails)) {
+            Session::flash('success', 'Permohonan telah berjaya ditolak.');
+        }else{
+            Session::flash('error', 'Permohonan tidak dapat ditolak.');
+        }
+
+        return redirect()->back();
     }
 }

@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-12">
             <div class="callout callout-info">
-                MOD DEMO: Beberapa ciri tidak tersedia untuk pemasangan ini.
+                PERMOHONAN: Cipta permohonan baru.
             </div>
             <div class="card">
                 <div class="card-body">
@@ -55,7 +55,7 @@
                 var selectedType =  parseInt($('#type').val());
 
                 if(type != selectedType){
-                    $('.'+content).hide();
+                    $('.'+content).hide().find(':input').prop('disabled', true);
                 }else{
                     $('.files-div').show();
                 }
@@ -71,9 +71,9 @@
                 $(this).addClass('active');
                 $('.handleType').each(function(event) {
                     var content = $(this).attr('id');
-                    $('.'+content).hide();
+                    $('.'+content).hide().find(':input').prop('disabled', true);
                 });
-                $('.'+content).show();
+                $('.'+content).show().find(':input').prop('disabled', false);
                 $('.files-div').show();
             });
         });

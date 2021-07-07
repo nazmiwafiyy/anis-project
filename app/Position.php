@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Profile;
 use Illuminate\Database\Eloquent\Model;
 
 class Position extends Model
@@ -162,6 +163,11 @@ class Position extends Model
             ['name'=>'SETIAUSAHA AKHBAR KEPADA YAB KETUA MENTERI MELAKA','description'=>'setiausaha akhbar kepada yab ketua menteri melaka'],
             ['name'=>'PEMBANTU SETIAUSAHA PEJABAT','description'=>'pembantu setiausaha pejabat'],
         ];
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
     }
 }
 

@@ -17,13 +17,19 @@
     <div class="row">
         <div class="col-12">
             <div class="callout callout-info">
-                MOD DEMO: Beberapa ciri tidak tersedia untuk pemasangan ini.
+                PERMOHONAN: Senarai permohonan yang telah dibuat.
             </div>
             <div class="card">
                 <div class="card-body">
-                    <p class="mb-0"></p>
+                    <div class="table-responsive">
+                        {!! $html->table() !!}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+@stop
+
+@section('adminlte_js')
+    {!! $html->scripts() !!}
 @stop

@@ -246,7 +246,10 @@ return [
             //     ],
             // ]
         ],
-        ['header' => 'TETAPAN PENGGUNA'],
+        [
+            'header' => 'TETAPAN PENGGUNA',
+            'can'  => ['read-users','read-roles'],
+        ],
         [
             'text' => 'Pengguna',
             // 'url'  => 'admin/settings',

@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/{application}/edit', 'ApplicationController@edit')->name('application.edit');
                 Route::put('/{application}', 'ApplicationController@update')->name('application.update');
                 Route::delete('/{application}', 'ApplicationController@destroy')->name('application.destroy');
+                Route::get('approve/{application}', 'ApplicationController@approve')->name('application.approve');
+                Route::get('reject/{application}', 'ApplicationController@reject')->name('application.reject');
             });
         });
 

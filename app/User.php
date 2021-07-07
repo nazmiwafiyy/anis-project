@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Profile;
+use App\Application;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
@@ -69,5 +70,10 @@ class User extends Authenticatable
     public function profile()
     {
         return $this->hasOne(Profile::class);
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
     }
 }

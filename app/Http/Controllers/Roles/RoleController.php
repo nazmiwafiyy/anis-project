@@ -20,7 +20,7 @@ class RoleController extends Controller
         $html = $builder->columns([
             ['data' => 'DT_RowIndex', 'name' => 'DT_RowIndex', 'title' => 'No','searchable' => false,'orderable' => false,],
             ['data' => 'display_name', 'name' => 'display_name', 'title' => 'Peranan','searchable' => true,'orderable' => true,],
-            ['data' => 'name', 'name' => 'name', 'title' => 'Slug','searchable' => true,'orderable' => true,],
+            // ['data' => 'name', 'name' => 'name', 'title' => 'Slug','searchable' => true,'orderable' => true,],
             ['data' => 'permission', 'name' => 'permission', 'title' => 'Keizinan','searchable' => false,'orderable' => false,],     
             ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Dicipta pada','searchable' => false,'orderable' => true,],
             ['data' => 'actions', 'name' => 'actions', 'title' => 'Tindakan','searchable' => false,'orderable' => false,],
@@ -30,14 +30,14 @@ class RoleController extends Controller
             'autoWidth' => false,
             'columnDefs' => [
                 ['targets' => 0,'width' => '5%',],
-                ['targets' => 1,'width' => '20%','className' => ''],
-                ['targets' => 2,'width' => '20%','className' => ''],
-                ['targets' => 3,'width' => '25%','className' => ''],
-                ['targets' => 4,'width' => '15%','className' => ''],
-                ['targets' => 5,'width' => '15%','className' => 'text-center'],
+                ['targets' => 1,'width' => '35%','className' => ''],
+                // ['targets' => 2,'width' => '20%','className' => ''],
+                ['targets' => 2,'width' => '30%','className' => ''],
+                ['targets' => 3,'width' => '15%','className' => ''],
+                ['targets' => 4,'width' => '15%','className' => 'text-center'],
             ],
             'language' => ['url' => url('//cdn.datatables.net/plug-ins/1.10.24/i18n/Malay.json')],
-            'order' => [4,'desc']
+            'order' => [3,'desc']
 
         ]);
 

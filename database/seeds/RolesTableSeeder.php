@@ -16,36 +16,35 @@ class RolesTableSeeder extends Seeder
         // Module
         $moduleId = DB::table('modules')->insertGetId([
             'name' => 'roles',
-            'display_name' => 'Roles',
-            'icon' => 'icon-key'
+            'display_name' => 'Peranan',
         ]);
 
         // Permissions
         DB::table('permissions')->insert([
             [
-                'name' => 'read-roles',
-                'display_name' => 'Read',
-                'guard_name' => 'web',
-                'module_id' => $moduleId
-            ],
-            [
+                'display_name' => 'Cipta Peranan',
                 'name' => 'create-roles',
-                'display_name' => 'Create',
                 'guard_name' => 'web',
                 'module_id' => $moduleId
             ],
             [
+                'display_name' => 'Papar Peranan',
+                'name' => 'read-roles',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'display_name' => 'Kemaskini Peranan',
                 'name' => 'update-roles',
-                'display_name' => 'Update',
                 'guard_name' => 'web',
                 'module_id' => $moduleId
             ],
             [
+                'display_name' => 'Padam Peranan',
                 'name' => 'delete-roles',
-                'display_name' => 'Delete',
                 'guard_name' => 'web',
                 'module_id' => $moduleId
-            ]
+            ],
         ]);
 
         // Create default roles
@@ -59,10 +58,34 @@ class RolesTableSeeder extends Seeder
         ]);
         $user = Role::create([
             'name' => 'user',
-            'display_name' => 'User'
+            'display_name' => 'Pengguna biasa'
         ]);
 
-        // Assign permissions to admin role
+        $headDepartmentApproval = Role::create([
+            'name' => 'approval-head-department',
+            'display_name' => 'Meluluskan(Ketua Jabatan)'
+        ]);
+
+        $welfareSocialBureaus = Role::create([
+            'name' => 'approval-welfare-social-bureaus',
+            'display_name' => 'Meluluskan(Biro Kebajikan dan Sosial)'
+        ]);
+
+        $secretarySportsWelfare  = Role::create([
+            'name' => 'approval-secretary-sports-welfare',
+            'display_name' => 'Meluluskan(Setiausaha / Penolong Setiausha Kelab Sukan dan Kebajikan JKMM)'
+        ]);
+
+        $treasurer = Role::create([
+            'name' => 'approval-treasurer',
+            'display_name' => 'Meluluskan(Bendahari / Penolong Bendahari)'
+        ]);
+
+        // Assign permissions
+        $superAdmin = Role::findByName('super-admin');
         $superAdmin->givePermissionTo(Permission::all());
+
+        $admin = Role::findByName('admin');
+        $admin->givePermissionTo(['read-roles']);
     }
 }

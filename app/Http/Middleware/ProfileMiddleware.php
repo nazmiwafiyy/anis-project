@@ -18,10 +18,10 @@ class ProfileMiddleware
     public function handle($request, Closure $next)
     {
         $user = $request->user();
-        if(!$request->routeIs('profile.create') && !$request->routeIs('profile.store') && $user && $user->id != 1 && !$user->profile)
+        if(!$request->routeIs('profile.edit') && !$request->routeIs('profile.update') && $user && !$user->hasRole('super-admin') && (!$user->profile->fullname || !$user->profile->identity_no || !$user->profile->phone_no || !$user->profile->position_id || !$user->profile->department_id))
         {
-            Session::flash('success', 'Sila kemas kini profil anda untuk meneruskan.');
-            return redirect()->route('profile.create');
+            Session::flash('success', 'Please update your profile to continue.');
+            return redirect()->route('profile.edit',$user->id);
         }
         return $next($request);
     }

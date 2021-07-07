@@ -17,6 +17,7 @@ class CreateApprovalsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('application_id');
             $table->unsignedInteger('user_id');
+            $table->char('status', 1);
             $table->timestamps();
 
             $table->index('application_id');
