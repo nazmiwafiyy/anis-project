@@ -76,4 +76,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Application::class);
     }
+
+    public function approvalLevel()
+    {
+        if($this->hasPermissionTo('approval-head-department')){
+            return 1;
+        }elseif($this->hasPermissionTo('approval-welfare-social-bureaus')){
+            return 2;
+        }elseif($this->hasPermissionTo('approval-secretary-sports-welfare')){
+            return 3;
+        }elseif($this->hasPermissionTo('approval-treasurer')){
+            return 4;
+        }else{
+            return 0;
+        }
+    }
 }

@@ -34,4 +34,21 @@ class Application extends Model
     public function approvals(){
         return $this->hasMany(Approval::class);
     }
+
+    public function currentApproveLevel(){
+        $current = 0;
+        foreach($this->approvals as $approval){
+            if($approval->approved_by->hasPermissionTo('approval-head-department')){
+                $current = $current < 1 ? 1 : $current;
+            }elseif($approval->approved_by->hasPermissionTo('approval-welfare-social-bureaus')){
+                $current = $current < 2 ? 2 : $current;
+            }elseif($approval->approved_by->hasPermissionTo('approval-secretary-sports-welfare')){
+                $current = $current < 3 ? 3 : $current;
+            }elseif($approval->approved_by->hasPermissionTo('approval-treasurer')){
+                $current = $current < 4 ? 4 : $current;
+            }
+        }
+
+        return $current;
+    }
 }

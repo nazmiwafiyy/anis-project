@@ -58,10 +58,22 @@ class ApplicationController extends Controller
                 ->addColumn('type', function(Application $application){  
                     return $application->type->name;
                 })
-                ->addColumn('approval', function(Application $application){  
-                    $approval = 'Paras<small class="text-muted float-right"> 2 of 4</small>
-                        <div class="progress progress-xxs progress-bar-danger">
-                            <div class="progress-bar progress-bar-danger" style="width: 50%"></div>
+                ->addColumn('approval', function(Application $application){
+                    $approvalCount = $application->approvals->where('status', 1)->count();
+                    $isRejected = $application->approvals->where('status', 0)->count() > 0 ? true : false;
+                    if($isRejected){
+                        $bgColor = 'bg-danger';
+                        $status = 'Gagal';
+                    }elseif($approvalCount == 4){
+                        $bgColor = 'bg-success';
+                        $status = 'Berjaya';
+                    }else{
+                        $bgColor = 'bg-primary';
+                        $status = 'Dalam Proses';
+                    }
+                    $approval = $status . '<small class="text-muted float-right">' .$approvalCount. 'of 4</small>
+                        <div class="progress progress-xxs">
+                            <div class="progress-bar '.$bgColor.'" style="width: '. ($approvalCount/4)*100 .'%"></div>
                         </div>';
                     return $approval;
                 })

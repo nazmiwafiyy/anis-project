@@ -8,10 +8,28 @@
             <h1 class="m-0 text-dark">Permohonan</h1>
         </div>
         <div class="float-md-right float-lg-right">
+            @php
+                $approvalCount = $application->approvals->where('status', 1)->count();
+                $isRejected = $application->approvals->where('status', 0)->count() > 0 ? true : false;
+                if($isRejected){
+                    $textColor = 'text-danger';
+                    $status = 'Gagal';
+                }elseif($approvalCount == 4){
+                    $textColor = 'text-success';
+                    $status = 'Berjaya';
+                }else{
+                    $textColor = 'text-primary';
+                    $status = 'Dalam Proses';
+                }
+                $currentLevel = $application->currentApproveLevel();
+                $userLevel = Auth::user()->approvalLevel();
+            @endphp
             @canany(['approval-head-department', 'approval-welfare-social-bureaus', 'approval-secretary-sports-welfare','approval-treasurer'])
-            @if (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()))
+            @if ($approvalCount < 4 && !$isRejected && $userLevel == $currentLevel+1)
+                @if (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()))
                 <a href="{{ route('application.reject',$application->id) }}" class="btn btn-danger btn-sm"><i class="fas fa-fw fa-times"></i>Tolak permohonan</a>
                 <a href="{{ route('application.approve',$application->id) }}" class="btn btn-success btn-sm"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</a>
+                @endif
             @endif
             @endcanany
             
@@ -30,7 +48,7 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h4>Status Permohonan</h4>
+                    <h4>Status Permohonan : <span class="{{$textColor}}">{{$status}}</span></h4>
                     <div class="timeline timeline-inverse">
                         @php
                             $totalApproved = 0; 
@@ -41,7 +59,7 @@
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
-                                        <span class="time"><i class="fas fa-clock"></i> 12:05</span>
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
                                         <h3 class="timeline-header">Kelulusan Ketua Jabatan</h3>
                                     </div>
                                 </div>
@@ -53,7 +71,7 @@
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
-                                        <span class="time"><i class="fas fa-clock"></i> 12:05</span>
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
                                         <h3 class="timeline-header">Kelulusan Biro Kebajikan dan Sosial</h3>
                                     </div>
                                 </div>
@@ -65,7 +83,7 @@
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
-                                        <span class="time"><i class="fas fa-clock"></i> 12:05</span>
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
                                         <h3 class="timeline-header">Kelulusan Setiausaha / Penolong Setiausha Kelab Sukan dan Kebajikan JKMM</h3>
                                     </div>
                                 </div>
@@ -77,7 +95,7 @@
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
-                                        <span class="time"><i class="fas fa-clock"></i> 12:05</span>
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
                                         <h3 class="timeline-header">Kelulusan Bendahari / Penolong Bendahari</h3>
                                     </div>
                                 </div>
