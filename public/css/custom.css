@@ -80,3 +80,24 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
 /* select[readonly].select2-hidden-accessible + .select2-container .select2-selection__arrow, select[readonly].select2-hidden-accessible + .select2-container .select2-selection__clear {
   display: none;
 } */
+
+.no-border{
+  border:none;
+}
+
+.no-border:focus-visible{
+  outline: none;
+}
+
+select.no-border{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}
+
+select.no-border:disabled{
+  opacity: 1;
+  color: black;
+  border-color:unset;
+}

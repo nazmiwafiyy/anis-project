@@ -29,6 +29,7 @@ class ApplicationController extends Controller
             ['data' => 'fullname', 'name' => 'user.profile.fullname', 'title' => 'Nama','searchable' => true,'orderable' => true,],
             ['data' => 'type', 'name' => 'type.name', 'title' => 'Perkara','searchable' => true,'orderable' => true,],
             ['data' => 'approval', 'name' => 'approval', 'title' => 'Kelulusan','searchable' => false,'orderable' => false,],
+            ['data' => 'approval_date', 'name' => 'approvals.created_at', 'title' => 'Diluluskan pada','searchable' => false,'orderable' => false,],
             ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Dicipta pada','searchable' => false,'orderable' => true,],
             ['data' => 'actions', 'name' => 'actions', 'title' => 'Tindakan','searchable' => false,'orderable' => false,],
         ])
@@ -37,18 +38,19 @@ class ApplicationController extends Controller
             'autoWidth' => false,
             'columnDefs' => [
                 ['targets' => 0,'width' => '5%',],
-                ['targets' => 1,'width' => '35%','className' => ''],
+                ['targets' => 1,'width' => '20%','className' => ''],
                 ['targets' => 2,'width' => '15%','className' => ''],
                 ['targets' => 3,'width' => '15%','className' => ''],
-                ['targets' => 4,'width' => '15%','className' => ''],
-                ['targets' => 5,'width' => '15%','className' => 'text-center'],
+                ['targets' => 4,'width' => '15%','className' => 'text-center'],
+                ['targets' => 5,'width' => '15%','className' => ''],
+                ['targets' => 6,'width' => '15%','className' => 'text-center'],
             ],
             'language' => ['url' => url('//cdn.datatables.net/plug-ins/1.10.24/i18n/Malay.json')],
-            'order' => [4,'desc'],
+            'order' => [5,'desc'],
         ]);
 
         if($request->ajax()){
-            $application = Application::with('user.profile','type');
+            $application = Application::with('user.profile','type','approvals')->select('applications.*');
             // $application = Application::query();
             return DataTables::of($application)
                 ->addIndexColumn()
@@ -77,8 +79,17 @@ class ApplicationController extends Controller
                         </div>';
                     return $approval;
                 })
-                ->addColumn('actions', function(Application $application){  
-                    $data = ['entity' => 'application','id' => $application->id]; 
+                ->addColumn('approval_date', function(Application $application){
+                    $approval_date = '-';
+                    if($application->is_approve == 'Y'){
+                        $approval = $application->approvals->where('status', 1)->sortByDesc('created_at')->first();
+                        $approval_date = $approval->created_at; 
+                    }  
+                    return $approval_date;
+                })
+                ->addColumn('actions', function(Application $application){ 
+                    $canEdit = ($application->approvals->count() > 0 ? false : true); 
+                    $data = ['entity' => 'application','id' => $application->id,'canEdit' => $canEdit]; 
                     return view('shared._actions',$data);
                 })
                 ->rawColumns(['approval','actions'])
@@ -134,8 +145,8 @@ class ApplicationController extends Controller
 
         $this->validate($request, [
             'fullname' => 'bail|required',
-            'position_id' => 'required|exists:positions,id',
-            'department_id' => 'required|exists:departments,id',
+            // 'position_id' => 'required|exists:positions,id',
+            // 'department_id' => 'required|exists:departments,id',
             'identity_no' => 'required|regex: /^\d{6}-\d{2}-\d{4}$/',
             'phone_no' => 'required|regex:/(01)[0-9]{9}/',
             'type_id' => 'required',
@@ -214,18 +225,36 @@ class ApplicationController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if(Application::findOrFail($id)->delete()) {
+            Session::flash('success', 'Permohonan telah berjaya dipadam.');
+        }else{
+            Session::flash('error', 'Permohonan tidak dapat dipadam.');
+        }
+
+        return redirect()->back();
     }
 
-    public function approve($id)
+    public function approve(Request $request,$id)
     {
+
         $application = Application::findorFail($id);
+
+        if(Auth::user()->can('approval-treasurer')) {
+            $application->fill($request->except('payment_prove'));
+            if($request->file('payment_prove')){
+                $document = $request->file('payment_prove');
+                $fileName = time().'_'.$document->getClientOriginalName();
+                $document->move(public_path('storage/documents/application/'. $application->user_id .'/'), $fileName);
+                $application->payment_prove = $fileName;
+            }
+            $application->is_approve = 'Y';
+        }
         $approvalDetails = [
             'application_id' => $application->id,
             'user_id' => Auth::user()->id,
             'status' => 1,
         ];
-        if($approvals = Approval::create($approvalDetails)) {
+        if($approvals = Approval::create($approvalDetails) && $application->save()) {
             Session::flash('success', 'Permohonan telah berjaya diluluskan.');
         }else{
             Session::flash('error', 'Permohonan tidak dapat diluluskan.');

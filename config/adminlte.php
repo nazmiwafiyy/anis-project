@@ -265,6 +265,34 @@ return [
             'can'  => 'read-roles',
             'active' => ['roles*',]
         ],
+        [
+            'header' => 'PENETAPAN SISTEM',
+            'can'  => ['read-position','read-department'],
+        ],
+        [
+            'text' => 'Jawatan',
+            'route' => 'position.index',
+            // 'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-briefcase',
+            'can'  => 'read-position',
+            'active' => ['position*',]
+        ],
+        [
+            'text' => 'Bahagian/Unit',
+            'route'  => 'department.index',
+            // 'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-building',
+            'can'  => 'read-department',
+            'active' => ['department*',]
+        ],
+        [
+            'text' => 'Jenis Permohonan',
+            // 'route'  => 'departments.index',
+            'url'  => 'admin/settings',
+            'icon' => 'fab fa-wpforms',
+            // 'can'  => 'read-department',
+            // 'active' => ['departments*',]
+        ]
     ],
 
     /*
@@ -429,6 +457,26 @@ return [
                     'type' => 'css',
                     'asset' => true,
                     'location' => 'vendor/bs-custom-file-input/bs-custom-file-input.min.js',
+                ],
+            ],
+        ],
+        'daterangepicker' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/daterangepicker/moment.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/daterangepicker/daterangepicker.js',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'vendor/daterangepicker/daterangepicker.css',
                 ],
             ],
         ],

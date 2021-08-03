@@ -1,33 +1,34 @@
 <div class="form-group row">
-    {!! Form::label('fullname', 'Nama Pemohon',['class' => 'col-md-2 required']) !!}
-    {!! Form::text('fullname', isset($application) ? $application->fullname : old('fullname'), ['class' => 'form-control col-md-10', 'placeholder' => 'Nama Pemohon', 'readonly'=> true]) !!}
+    {!! Form::label('fullname', 'Nama Pemohon',['class' => 'col-md-2']) !!}
+    {!! Form::text('fullname', isset($application) ? $application->fullname : old('fullname'), ['class' => 'no-border col-md-10', 'placeholder' => 'Nama Pemohon', 'readonly'=> true]) !!}
 </div>
 
 <div class="form-group row">
-    {!! Form::label('identity_no', 'No. Kad Pengenalan',['class' => 'col-md-2 required']) !!}
-    {!! Form::text('identity_no', isset($application) ? $application->identity_no : old('identity_no'), ['class' => 'form-control col-md-10', 'placeholder' => 'No. Kad Pengenalan', 'readonly'=> true]) !!}
+    {!! Form::label('identity_no', 'No. Kad Pengenalan',['class' => 'col-md-2']) !!}
+    {!! Form::text('identity_no', isset($application) ? $application->identity_no : old('identity_no'), ['class' => 'no-border col-md-10', 'placeholder' => 'No. Kad Pengenalan', 'readonly'=> true]) !!}
 </div>
 
 <div class="form-group row">
-    {!! Form::label('position_id', 'Jawatan',['class'=>'col-md-2 required']) !!}
-    {!! Form::select('position_id', $position, isset($application) ? $application->position_id : old('position_id'),  ['class' => 'form-control col-md-10 select2'.($errors->has('position_id') ? ' is-invalid' : null), 'placeholder' => 'Sila pilih jawatan', 'readonly'=> true]) !!}
-    @if ($errors->has('position_id')) <small class="help-block text-danger">{{ $errors->first('position_id') }}</small> @endif
+    {!! Form::label('position_id', 'Jawatan',['class'=>'col-md-2']) !!}
+    {!! Form::select('position_id', $position, isset($application) ? $application->position_id : old('position_id'),  ['class' => 'no-border col-md-10'.($errors->has('position_id') ? ' is-invalid' : null), 'placeholder' => 'Sila pilih jawatan', 'disabled'=> true]) !!}
+    {{-- @if ($errors->has('position_id')) <small class="help-block text-danger">{{ $errors->first('position_id') }}</small> @endif --}}
 </div>
 
 <div class="form-group row">
-    {!! Form::label('department_id', 'Bahagian / Unit',['class'=>'col-md-2 required']) !!}
-    {!! Form::select('department_id', $department, isset($application) ? $application->department_id : old('department_id'),  ['class' => 'form-control col-md-10 select2'.($errors->has('department_id') ? ' is-invalid' : null), 'placeholder' => 'Sila pilih bahagian/unit', 'readonly'=> true]) !!}
-    @if ($errors->has('department_id')) <small class="help-block text-danger">{{ $errors->first('department_id') }}</small> @endif
+    {!! Form::label('department_id', 'Bahagian / Unit',['class'=>'col-md-2']) !!}
+    {!! Form::select('department_id', $department, isset($application) ? $application->department_id : old('department_id'),  ['class' => 'no-border col-md-10'.($errors->has('department_id') ? ' is-invalid' : null), 'placeholder' => 'Sila pilih bahagian/unit', 'disabled'=> true]) !!}
+    {{-- @if ($errors->has('department_id')) <small class="help-block text-danger">{{ $errors->first('department_id') }}</small> @endif --}}
 </div>
 
 <div class="form-group row">
-    {!! Form::label('phone_no', 'No Telefon',['class'=>'col-md-2 required']) !!}
-    {!! Form::text('phone_no', isset($application) ? $application->phone_no : old('phone_no'), ['class' => 'form-control col-md-10'.($errors->has('phone_no') ? ' is-invalid' : null), 'placeholder' => 'cth : 0191234568', 'readonly'=> true]) !!}
-    @if ($errors->has('phone_no')) <small class="help-block text-danger">{{ $errors->first('phone_no') }}</small> @endif
+    {!! Form::label('phone_no', 'No Telefon',['class'=>'col-md-2']) !!}
+    {!! Form::text('phone_no', isset($application) ? $application->phone_no : old('phone_no'), ['class' => 'no-border col-md-10'.($errors->has('phone_no') ? ' is-invalid' : null), 'placeholder' => 'cth : 0191234568', 'readonly'=> true]) !!}
+    {{-- @if ($errors->has('phone_no')) <small class="help-block text-danger">{{ $errors->first('phone_no') }}</small> @endif --}}
 </div>
 
-<div class="form-group dropdown">
-    {!! Form::button('Perkara', ['type' => 'button', 'class' => 'btn btn-primary btn-sm dropdown-toggle', 'data-toggle'=>'dropdown','aria-expanded'=>'false', 'aria-haspopup'=>'true','id'=>'dropdownMenuButton'] )  !!}
+<div class="form-group dropdown row">
+    {!! Form::label('', 'Perkara',['class'=>'col-md-2']) !!}
+    {!! Form::button('Jenis Permohonan', ['type' => 'button', 'class' => 'col-md-10 form-control dropdown-toggle', 'data-toggle'=>'dropdown','aria-expanded'=>'false', 'aria-haspopup'=>'true','id'=>'dropdownMenuButton'] )  !!}
     {!! Form::hidden('type_id', null, ['id' => 'type']) !!}
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         @foreach ($types as $type)

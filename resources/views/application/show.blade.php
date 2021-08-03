@@ -27,18 +27,76 @@
             @canany(['approval-head-department', 'approval-welfare-social-bureaus', 'approval-secretary-sports-welfare','approval-treasurer'])
             @if ($approvalCount < 4 && !$isRejected && $userLevel == $currentLevel+1)
                 @if (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()))
-                <a href="{{ route('application.reject',$application->id) }}" class="btn btn-danger btn-sm"><i class="fas fa-fw fa-times"></i>Tolak permohonan</a>
-                <a href="{{ route('application.approve',$application->id) }}" class="btn btn-success btn-sm"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</a>
+                    <a href="{{ route('application.reject',$application->id) }}" class="btn btn-danger btn-sm "><i class="fas fa-fw fa-times"></i>Tolak permohonan</a>
+                    @if ($userLevel == 4)
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</button>
+                    @else
+                        <button type="button" class="btn btn-success btn-sm approveButton"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</button>
+                    @endif
                 @endif
             @endif
             @endcanany
             
+
             <a href="{{ URL::previous() }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-chevron-left"></i>Kembali</a>
         </div>
     </div>
 @stop
 
 @section('content')
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="approveForm" method="POST" action="{{ route('application.approve',$application->id) }}" enctype="multipart/form-data">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Maklumat Pembayaran</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        {!! csrf_field() !!}
+                        {{-- <input type="hidden" name="id" value="{!! $application->id !!}" /> --}}
+                        <div class="form-group">
+                        <label for="payment" class="col-form-label">Jumlah bayaran</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                            <span class="input-group-text">RM</span>
+                            </div>
+                            <input name="payment" type="number" min="0" class="form-control" required>
+                        </div>
+                        </div>
+                        <div class="form-group">
+                        <label for="payment_date" class="col-form-label">Tarikh bayaran</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="far fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                            <input class="form-control" placeholder="Tarikh bayaran" name="payment_date" type="text" id="payment_date" required>
+                            <span class="input-group-append">
+                                <button type="button" class="btn btn-default clear-payment-date">Hapus</button>
+                            </span>
+                        </div>
+                        </div>
+                        <label for="">Bukti bayaran</label>
+                        <div class="custom-file ">
+                            <label for="payment_prove" class="custom-file-label">
+                                    Bukti bayaran
+                            </label>
+                            <input name="payment_prove" type="file" class="custom-file-input form-control-sm" multiple="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="callout callout-info">
@@ -163,7 +221,7 @@
                                 <div>
                                     <ul class="fa-ul">
                                         @foreach ($application->files as $file)
-                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.Auth::user()->id.'/'.$file->path)}}">{{$file->path}}</a></li>
+                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.$application->user_id.'/'.$file->path)}}">{{$file->path}}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -180,7 +238,7 @@
                                 <div>
                                     <ul class="fa-ul">
                                         @foreach ($application->files as $file)
-                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.Auth::user()->id.'/'.$file->path)}}">{{$file->path}}</a></li>
+                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.$application->user_id.'/'.$file->path)}}">{{$file->path}}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -197,7 +255,7 @@
                                 <div>
                                     <ul class="fa-ul">
                                         @foreach ($application->files as $file)
-                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.Auth::user()->id.'/'.$file->path)}}">{{$file->path}}</a></li>
+                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.$application->user_id.'/'.$file->path)}}">{{$file->path}}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -214,7 +272,7 @@
                                 <div>
                                     <ul class="fa-ul">
                                         @foreach ($application->files as $file)
-                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.Auth::user()->id.'/'.$file->path)}}">{{$file->path}}</a></li>
+                                            <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.$application->user_id.'/'.$file->path)}}">{{$file->path}}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -223,6 +281,67 @@
                     @endif
                 </div>
             </div>
+            @if ($application->is_approve == 'Y')
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="mb-4">Perincian Bayaran</h4>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label>Jumlah Bayaran</label>
+                            <div class="form-control">RM{{$application->payment}}</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label>Tarikh Bayaran</label> 
+                            <div class="form-control">{{$application->payment_date}}</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label>Bukti Bayaran</label> 
+                            <div>
+                                <ul class="fa-ul">
+                                    @foreach ($application->files as $file)
+                                        <li><i class="fa-li fa fa-file"></i><a target="_blank" href="{{Storage::url('documents/application/'.$application->user_id.'/'.$application->payment_prove)}}">{{$application->payment_prove}}</a></li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
+@stop
+
+@section('adminlte_js')
+    <script>
+        $(function() {          
+            //Initialize custom-file-input
+            bsCustomFileInput.init();
+
+            $('#payment_date').daterangepicker({
+                autoUpdateInput: false,
+                singleDatePicker: true,
+                drops: 'bottom',
+                locale: {
+                    format: 'YYYY-MM-DD',
+                }
+            }, function(date) {
+                $('#payment_date').val(date.format('YYYY-MM-DD'));
+            });
+
+            $('.clear-payment-date').click(function() {
+                $('#payment_date').val('');
+            });
+
+            $('.approveButton').click( function() {
+                $('#approveForm').submit();
+            });
+
+            
+        });
+    </script>
 @stop

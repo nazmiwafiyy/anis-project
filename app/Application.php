@@ -6,6 +6,7 @@ use App\File;
 use App\Type;
 use App\User;
 use App\Approval;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Application extends Model
@@ -15,6 +16,12 @@ class Application extends Model
     protected $casts = [
         'created_at' => 'datetime:d-m-Y g:i A',
     ];
+
+    public function getPaymentDateAttribute()
+    {
+        // return $this->attributes['payment_date'];
+        return Carbon::parse($this->attributes['payment_date'])->format('d-m-Y');
+    } 
     
     public function files()
     {

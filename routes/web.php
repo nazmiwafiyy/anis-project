@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/{application}/edit', 'ApplicationController@edit')->name('application.edit');
                 Route::put('/{application}', 'ApplicationController@update')->name('application.update');
                 Route::delete('/{application}', 'ApplicationController@destroy')->name('application.destroy');
-                Route::get('approve/{application}', 'ApplicationController@approve')->name('application.approve');
+                Route::post('approve/{application}', 'ApplicationController@approve')->name('application.approve');
                 Route::get('reject/{application}', 'ApplicationController@reject')->name('application.reject');
             });
         });
@@ -72,6 +72,30 @@ Route::middleware('auth')->group(function () {
                 Route::post('/', 'ProfileController@store')->name('profile.store');
                 Route::get('/{profile}/edit', 'ProfileController@edit')->name('profile.edit');
                 Route::put('/{profile}', 'ProfileController@update')->name('profile.update');
+            });
+        });
+
+        Route::group(['namespace' => 'Position'], function() {
+            Route::group(['prefix' => 'position'], function() {
+                Route::get('/', 'PositionController@index')->name('position.index')->middleware('permission:read-position');
+                Route::get('/create', 'PositionController@create')->name('position.create')->middleware('permission:create-position');
+                Route::post('/', 'PositionController@store')->name('position.store')->middleware('permission:create-position');
+                Route::get('/{position}', 'PositionController@show')->name('position.show')->middleware('permission:read-position');
+                Route::get('/{position}/edit', 'PositionController@edit')->name('position.edit')->middleware('permission:update-position');
+                Route::put('/{position}', 'PositionController@update')->name('position.update')->middleware('permission:update-position');
+                Route::delete('/{position}', 'PositionController@destroy')->name('position.destroy')->middleware('permission:delete-position');
+            });
+        });
+
+        Route::group(['namespace' => 'Department'], function() {
+            Route::group(['prefix' => 'department'], function() {
+                Route::get('/', 'DepartmentController@index')->name('department.index')->middleware('permission:read-department');
+                Route::get('/create', 'DepartmentController@create')->name('department.create')->middleware('permission:create-department');
+                Route::post('/', 'DepartmentController@store')->name('department.store')->middleware('permission:create-department');
+                Route::get('/{department}', 'DepartmentController@show')->name('department.show')->middleware('permission:read-department');
+                Route::get('/{department}/edit', 'DepartmentController@edit')->name('department.edit')->middleware('permission:update-department');
+                Route::put('/{department}', 'DepartmentController@update')->name('department.update')->middleware('permission:update-department');
+                Route::delete('/{department}', 'DepartmentController@destroy')->name('department.destroy')->middleware('permission:delete-department');
             });
         });
     });

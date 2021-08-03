@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Position extends Model
 {
+    protected $guarded = ['id'];  
+    
+    protected $casts = [
+        'created_at' => 'datetime:d-m-Y g:i A',
+    ];
+    
     public static function defaultPositions()
     {
         return [
