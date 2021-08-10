@@ -5,10 +5,10 @@
 @section('content_header')
     <div class="clearfix">
         <div class="float-md-left float-lg-left">
-            <h1 class="m-0 text-dark">Positions</h1>
+            <h1 class="m-0 text-dark">Jawatan</h1>
         </div>
         <div class="float-md-right float-lg-right">
-            <a href="{{ route('position.index') }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-chevron-left"></i>Back</a>
+            <a href="{{ route('position.index') }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-chevron-left"></i>Kembali</a>
         </div>
     </div>
 @stop
@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-12">
             <div class="callout callout-info">
-                POSITIONS: Create new position.
+                JAWATAN: Cipta jawatan baru.
             </div>
             <div class="card">
                 <div class="card-body">
@@ -25,7 +25,7 @@
                     @include('position._form')
                     <div class="clearfix">
                         <div class="float-right">
-                            {!! Form::button('<i class="fa fa-fw fa-check"></i>Save', ['type' => 'submit', 'class' => 'btn btn-primary btn-sm'] )  !!}
+                            {!! Form::button('<i class="fa fa-fw fa-check"></i>Simpan', ['type' => 'submit', 'class' => 'btn btn-primary btn-sm'] )  !!}
                         </div>
                     </div>
                     {!! Form::close() !!}

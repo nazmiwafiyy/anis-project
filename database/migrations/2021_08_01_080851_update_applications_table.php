@@ -18,7 +18,7 @@ class UpdateApplicationsTable extends Migration
             $table->string('payment',10)->nullable();
             $table->timestamp('payment_date',0)->nullable();
             $table->string('payment_prove',100)->nullable();
-            $table->char('is_approve',1)->default('N')->nullable();
+            $table->char('is_approve',1)->nullable();
         });
     }
 

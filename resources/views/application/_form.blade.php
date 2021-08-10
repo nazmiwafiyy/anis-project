@@ -36,7 +36,7 @@
         @endforeach
     </div>
     <br>
-    @if ($errors->has('type_id')) <small class="help-block text-danger">{{ $errors->first('type_id') }}</small> @endif
+    &nbsp;&nbsp;@if ($errors->has('type_id')) <small class="help-block text-danger">{{ $errors->first('type_id') }}</small> @endif
 </div>
 
 

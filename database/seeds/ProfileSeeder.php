@@ -44,5 +44,11 @@ class ProfileSeeder extends Seeder
         // Assign permissions to super-admin role
         $admin = Role::findByName('super-admin');
         $admin->givePermissionTo(Permission::all());
+
+        $admin = Role::findByName('admin');
+        $admin->givePermissionTo(['read-profile','update-profile','update-profile-password']);
+        
+        $user = Role::findByName('user');
+        $user->givePermissionTo(['read-profile','update-profile','update-profile-password']);
     }
 }

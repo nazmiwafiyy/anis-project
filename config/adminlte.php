@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'AdminLTE 3',
+    'title' => 'Kelab Sukan & Kebajikan JKMM',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -45,12 +45,12 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img_class' => 'brand-image img-circle elevation-3',
-    'logo_img_xl' => null,
+    'logo' => '<br><b> KELAB SUKAN DAN KEBAJIKAN JKMM </b>',
+    'logo_img' => 'logo/logo-2.png',
+    'logo_img_class' => 'brand-image img-circle ',
+    'logo_img_xl' => 'logo/logo-2_xl.png',
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'AdminLTE',
+    'logo_img_alt' => 'Kelab Sukan & Kebajikan JKMM',
 
     /*
     |--------------------------------------------------------------------------
@@ -230,21 +230,27 @@ return [
             'topnav' => true,
         ],
         [
-            'text'  => 'Papan Pemuka',
+            'text'  => 'Dashboard',
             'route' => 'home',
             'icon'  => 'fas fa-fw fa-tachometer-alt',
         ],
         [
-            'text'  => 'Permohonan',
-            'route' => 'application.index',
+            'text'  => 'Permohonan Baru',
+            'route' => 'application.create',
             'icon'  => 'fas fa-fw fa-copy',
-            'active' => ['application*',]
+            'active' => ['application.create',]
             // 'submenu' => [
             //     [
             //         'text' => 'level_one',
             //         'url'  => '#',
             //     ],
             // ]
+        ],
+        [
+            'text'  => 'Status Permohonan',
+            'route' => 'application.index',
+            'icon'  => 'fas fa-fw fa-list',
+            'active' => ['application','regex:@^application/[0-9]+$@'],
         ],
         [
             'header' => 'TETAPAN PENGGUNA',
@@ -286,13 +292,26 @@ return [
             'active' => ['department*',]
         ],
         [
-            'text' => 'Jenis Permohonan',
-            // 'route'  => 'departments.index',
-            'url'  => 'admin/settings',
+            'text' => 'Perkara',
+            'route'  => 'type.index',
             'icon' => 'fab fa-wpforms',
-            // 'can'  => 'read-department',
-            // 'active' => ['departments*',]
-        ]
+            'can'  => 'read-type',
+            'active' => ['type*',]
+        ],
+        [
+            'header' => 'DALAM TINDAKAN',
+            // 'can'  => ['approval-head-department','approval-welfare-social-bureaus','approval-secretary-sports-welfare','approval-treasurer'],
+            'can'  => ['read-approval'],
+        ],
+        [
+            'text' => 'Senarai Permohonan',
+            'route'  => 'approval.index',
+            // 'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-tasks',
+            // 'can'  => ['approval-head-department','approval-welfare-social-bureaus','approval-secretary-sports-welfare','approval-treasurer'],
+            'can'  => ['read-approval'],
+            'active' => ['approval*',]
+        ],
     ],
 
     /*

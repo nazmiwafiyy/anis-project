@@ -23,7 +23,8 @@
                  alt="{{ Auth::user()->name }}">
         @endif
         <span @if(config('adminlte.usermenu_image')) class="d-none d-md-inline" @endif>
-            {{ Auth::user()->name }}
+            {{ Auth::user()->profile->fullname ? Auth::user()->profile->fullname : Auth::user()->name }}
+            {{-- {{ Auth::user()->name }} --}}
         </span>
     </a>
 
@@ -75,7 +76,7 @@
                     </a>
                 @endif
                 <div class="dropdown-divider"></div>
-                <a href="change-password" class="dropdown-item">
+                <a href="/profile/change-password" class="dropdown-item">
                     <i class="fa fa-fw fa-key mr-2"></i>
                     {{ __('adminlte::menu.change_password') }}
                 </a>

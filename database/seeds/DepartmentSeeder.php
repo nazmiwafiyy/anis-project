@@ -63,6 +63,6 @@ class DepartmentSeeder extends Seeder
         $superAdmin->givePermissionTo(Permission::all());
 
         $admin = Role::findByName('admin');
-        $admin->givePermissionTo(['create-department','read-department','update-department']);
+        $admin->givePermissionTo(['create-department','read-department','update-department','delete-department']);
     }
 }

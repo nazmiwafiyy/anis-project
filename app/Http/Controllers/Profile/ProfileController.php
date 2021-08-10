@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Profile;
 
+use App\User;
 use App\Profile;
 use App\Position;
 use App\Department;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -64,7 +67,7 @@ class ProfileController extends Controller
             'position_id' => 'required|exists:positions,id',
             'department_id' => 'required|exists:departments,id',
             'identity_no' => 'required|regex: /^\d{6}-\d{2}-\d{4}$/',
-            'phone_no' => 'required|regex:/(01)[0-9]{9}/',
+            'phone_no' => 'required|regex:/(01)[0-9]{8,9}/',
             'picture' => 'mimes:jpeg,jpg,png,gif|nullable'
         ], [], $attributes);
         $data = $request->all();
@@ -102,25 +105,68 @@ class ProfileController extends Controller
             'position_id' => 'required|exists:positions,id',
             'department_id' => 'required|exists:departments,id',
             'identity_no' => 'required|regex: /^\d{6}-\d{2}-\d{4}$/',
-            'phone_no' => 'required|regex:/(01)[0-9]{9}/',
+            'phone_no' => 'required|regex:/(01)[0-9]{8,9}/',
             'picture' => 'mimes:jpeg,jpg,png,gif|nullable'
         ], [], $attributes);
 
         $profile = Profile::findOrFail($id);
 
+        // if($request->hasFile('picture')){
+        //     $image = $request->file('picture');
+        //     $imageName = 'profile.'.$request->picture->extension(); 
+        //     Image::make($image)->resize(300,300)->save(public_path('storage/profiles/'. $request->user()->id .'/' . $imageName));
+        //     $profile->picture =  $imageName;
+        // }
+
         if($request->hasFile('picture')){
             $image = $request->file('picture');
             $imageName = 'profile.'.$request->picture->extension(); 
-            Image::make($image)->resize(300,300)->save(public_path('storage/profiles/'. $request->user()->id .'/' . $imageName));
+            $picture = Image::make($image)->resize(300,300)->encode('png');
+            Storage::disk('public')->put('profiles/'.$request->user()->id.'/'.$imageName, $picture);
             $profile->picture =  $imageName;
         }
-        
+
         $profile->fill($request->except('picture'));
 
         if ($profile->save()){
             Session::flash('success', 'Profil berjaya dikemas kini.');
         }else{
             Session::flash('error', 'Profil tidak berjaya dikemas kini.');
+        }
+
+        return redirect()->route('home');
+    }
+
+    public function editPassword(Request $request)
+    {
+        return view('profile.edit-password');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = User::find(Auth::id());
+
+        $attributes = [
+            'current' => 'kata laluan semasa',
+            'password' => 'kata laluan baru',
+            'password_confirmation' => 'pengesahan kata laluan',
+        ];
+        
+        $this->validate($request, [
+            'current' => ['required', function ($attribute, $value, $fail) use ($user) {
+                if (!\Hash::check($value, $user->password)) {
+                    return $fail(__('Kata laluan semasa tidak tepat.'));
+                }
+            }],
+            'password' => 'required|regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/ |confirmed',
+            'password_confirmation' => 'required|string'
+        ], [], $attributes);
+
+        $user->password = Hash::make($request->password);
+        if ($user->save()){
+            Session::flash('success', 'Kata laluan berjaya dikemas kini.');
+        }else{
+            Session::flash('error', 'Kata laluan tidak berjaya dikemas kini.');
         }
 
         return redirect()->route('home');

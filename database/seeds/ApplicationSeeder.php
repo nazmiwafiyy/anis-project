@@ -33,12 +33,12 @@ class ApplicationSeeder extends Seeder
                 'guard_name' => 'web',
                 'module_id' => $moduleId
             ],
-            [
-                'display_name' => 'Kemaskini Permohonan',
-                'name' => 'update-application',
-                'guard_name' => 'web',
-                'module_id' => $moduleId
-            ],
+            // [
+            //     'display_name' => 'Kemaskini Permohonan',
+            //     'name' => 'update-application',
+            //     'guard_name' => 'web',
+            //     'module_id' => $moduleId
+            // ],
             [
                 'display_name' => 'Padam Permohonan',
                 'name' => 'delete-application',
@@ -69,6 +69,18 @@ class ApplicationSeeder extends Seeder
                 'guard_name' => 'web',
                 'module_id' => $moduleId
             ],
+            [
+                'display_name' => 'Meluluskan(Papar)',
+                'name' => 'read-approval',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'display_name' => 'Meluluskan(Padam)',
+                'name' => 'delete-approval',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
         ]);
 
         // Assign permissions
@@ -76,21 +88,21 @@ class ApplicationSeeder extends Seeder
         $superAdmin->givePermissionTo(Permission::all());
 
         $admin = Role::findByName('admin');
-        $admin->givePermissionTo(['create-application','read-application','update-application','delete-application']);
+        $admin->givePermissionTo(['create-application','read-application','delete-application','read-approval']);
 
         $user = Role::findByName('user');
-        $user->givePermissionTo(['create-application','read-application']);
+        $user->givePermissionTo(['create-application','read-application','delete-application']);
 
         $headDepartmentApproval = Role::findByName('approval-head-department');
-        $headDepartmentApproval->givePermissionTo('approval-head-department');
+        $headDepartmentApproval->givePermissionTo('approval-head-department','read-approval');
 
         $welfareSocialBureaus = Role::findByName('approval-welfare-social-bureaus');
-        $welfareSocialBureaus->givePermissionTo('approval-welfare-social-bureaus');
+        $welfareSocialBureaus->givePermissionTo('approval-welfare-social-bureaus','read-approval');
 
         $secretarySportsWelfare = Role::findByName('approval-secretary-sports-welfare');
-        $secretarySportsWelfare->givePermissionTo('approval-secretary-sports-welfare');
+        $secretarySportsWelfare->givePermissionTo('approval-secretary-sports-welfare','read-approval');
 
         $treasurer = Role::findByName('approval-treasurer');
-        $treasurer->givePermissionTo('approval-treasurer');
+        $treasurer->givePermissionTo('approval-treasurer','read-approval');
     }
 }

@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
+    return redirect('login');
 });
 
 Route::get('/home', function () {
@@ -30,48 +31,58 @@ Route::middleware('auth')->group(function () {
         Route::group(['namespace' => 'Application'], function() {
             Route::group(['prefix' => 'application'], function() {
                 // Route::get('/', 'ApplicationController@index')->middleware('permission:read-application');
-                Route::get('/', 'ApplicationController@index')->name('application.index');
-                Route::get('/create', 'ApplicationController@create')->name('application.create');
-                Route::post('/', 'ApplicationController@store')->name('application.store');
-                Route::get('/{application}', 'ApplicationController@show')->name('application.show');
-                Route::get('/{application}/edit', 'ApplicationController@edit')->name('application.edit');
-                Route::put('/{application}', 'ApplicationController@update')->name('application.update');
-                Route::delete('/{application}', 'ApplicationController@destroy')->name('application.destroy');
+                Route::get('/', 'ApplicationController@index')->name('application.index')->middleware('permission:read-application');
+                Route::get('/create', 'ApplicationController@create')->name('application.create')->middleware('permission:create-application');
+                Route::post('/', 'ApplicationController@store')->name('application.store')->middleware('permission:create-application');
+                Route::get('/{application}', 'ApplicationController@show')->name('application.show')->middleware('permission:read-application');
+                // Route::get('/{application}/edit', 'ApplicationController@edit')->name('application.edit')->middleware('permission:update-application');
+                // Route::put('/{application}', 'ApplicationController@update')->name('application.update')->middleware('permission:update-application');
+                Route::delete('/{application}', 'ApplicationController@destroy')->name('application.destroy')->middleware('permission:delete-application');
                 Route::post('approve/{application}', 'ApplicationController@approve')->name('application.approve');
                 Route::get('reject/{application}', 'ApplicationController@reject')->name('application.reject');
+
+            });
+
+            Route::group(['prefix' => 'approval'], function() {
+                Route::get('/', 'ApprovalController@index')->name('approval.index')->middleware('permission:read-approval');
+                Route::get('/{approval}', 'ApprovalController@show')->name('approval.show')->middleware('permission:read-approval');
+                Route::delete('/{approval}', 'ApprovalController@destroy')->name('approval.destroy')->middleware('permission:delete-approval');
             });
         });
 
         Route::group(['namespace' => 'Users'], function() {
             Route::group(['prefix' => 'users'], function() {
-                Route::get('/', 'UserController@index')->name('users.index');
-                Route::get('/create', 'UserController@create')->name('users.create');
-                Route::post('/', 'UserController@store')->name('users.store');
-                Route::get('/{user}', 'UserController@show')->name('users.show');
-                Route::get('/{user}/edit', 'UserController@edit')->name('users.edit');
-                Route::put('/{user}', 'UserController@update')->name('users.update');
-                Route::delete('/{user}', 'UserController@destroy')->name('users.destroy');
+                Route::get('/', 'UserController@index')->name('users.index')->middleware('permission:read-users');
+                Route::get('/create', 'UserController@create')->name('users.create')->middleware('permission:create-users');
+                Route::post('/', 'UserController@store')->name('users.store')->middleware('permission:create-users');
+                Route::get('/{user}', 'UserController@show')->name('users.show')->middleware('permission:read-users');
+                Route::get('/{user}/edit', 'UserController@edit')->name('users.edit')->middleware('permission:update-users');
+                Route::put('/{user}', 'UserController@update')->name('users.update')->middleware('permission:update-users');
+                Route::delete('/{user}', 'UserController@destroy')->name('users.destroy')->middleware('permission:delete-users');
             });
         });
 
         Route::group(['namespace' => 'Roles'], function() {
             Route::group(['prefix' => 'roles'], function() {
-                Route::get('/', 'RoleController@index')->name('roles.index');
-                Route::get('/create', 'RoleController@create')->name('roles.create');
-                Route::post('/', 'RoleController@store')->name('roles.store');
-                Route::get('/{role}', 'RoleController@show')->name('roles.show');
-                Route::get('/{role}/edit', 'RoleController@edit')->name('roles.edit');
-                Route::put('/{role}', 'RoleController@update')->name('roles.update');
-                Route::delete('/{role}', 'RoleController@destroy')->name('roles.destroy');
+                Route::get('/', 'RoleController@index')->name('roles.index')->middleware('permission:read-roles');
+                Route::get('/create', 'RoleController@create')->name('roles.create')->middleware('permission:create-rolese');
+                Route::post('/', 'RoleController@store')->name('roles.store')->middleware('permission:create-roles');
+                Route::get('/{role}', 'RoleController@show')->name('roles.show')->middleware('permission:read-roles');
+                Route::get('/{role}/edit', 'RoleController@edit')->name('roles.edit')->middleware('permission:update-roles');
+                Route::put('/{role}', 'RoleController@update')->name('roles.update')->middleware('permission:update-roles');
+                Route::delete('/{role}', 'RoleController@destroy')->name('roles.destroy')->middleware('permission:delete-roles');
             });
         });
 
         Route::group(['namespace' => 'Profile'], function() {
             Route::group(['prefix' => 'profile'], function() {
-                Route::get('/', 'ProfileController@create')->name('profile.create');
-                Route::post('/', 'ProfileController@store')->name('profile.store');
-                Route::get('/{profile}/edit', 'ProfileController@edit')->name('profile.edit');
-                Route::put('/{profile}', 'ProfileController@update')->name('profile.update');
+                Route::get('/', 'ProfileController@create')->name('profile.create')->middleware('permission:update-profile');
+                // Route::post('/', 'ProfileController@store')->name('profile.store')->middleware('permission:create-profile');
+                Route::get('/{profile}/edit', 'ProfileController@edit')->name('profile.edit')->middleware('permission:update-profile');
+                Route::put('/{profile}', 'ProfileController@update')->name('profile.update')->middleware('permission:update-profile');
+
+                Route::get('/change-password', 'ProfileController@editPassword')->name('profile.edit-password')->middleware('permission:update-profile-password');
+                Route::post('/change-password', 'ProfileController@updatePassword')->name('profile.update-password')->middleware('permission:update-profile-password');
             });
         });
 
@@ -98,5 +109,15 @@ Route::middleware('auth')->group(function () {
                 Route::delete('/{department}', 'DepartmentController@destroy')->name('department.destroy')->middleware('permission:delete-department');
             });
         });
+
+        Route::group(['namespace' => 'Type'], function() {
+            Route::group(['prefix' => 'type'], function() {
+                Route::get('/', 'TypeController@index')->name('type.index')->middleware('permission:read-type');
+                Route::get('/{type}', 'TypeController@show')->name('type.show')->middleware('permission:read-type');
+                Route::get('/{type}/edit', 'TypeController@edit')->name('type.edit')->middleware('permission:update-type');
+                Route::put('/{type}', 'TypeController@update')->name('type.update')->middleware('permission:update-type');
+            });
+        });
+
     });
 });

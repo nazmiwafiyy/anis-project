@@ -63,7 +63,7 @@ class PositionSeeder extends Seeder
         $superAdmin->givePermissionTo(Permission::all());
 
         $admin = Role::findByName('admin');
-        $admin->givePermissionTo(['create-position','read-position','update-position']);
+        $admin->givePermissionTo(['create-position','read-position','update-position','delete-position']);
 
 
     }

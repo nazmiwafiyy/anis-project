@@ -14,9 +14,8 @@ use Yajra\DataTables\Html\Builder;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
 
-class ApplicationController extends Controller
+class ApprovalController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +33,7 @@ class ApplicationController extends Controller
             ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Dicipta pada','searchable' => false,'orderable' => true,],
             ['data' => 'actions', 'name' => 'actions', 'title' => 'Tindakan','searchable' => false,'orderable' => false,],
         ])
-        ->ajax(['url' => route('application.index'),'type' => 'GET','data' => 'function(d) { d.key = "value"; }'])
+        ->ajax(['url' => route('approval.index'),'type' => 'GET','data' => 'function(d) { d.key = "value"; }'])
         ->parameters([
             'autoWidth' => false,
             'columnDefs' => [
@@ -51,7 +50,7 @@ class ApplicationController extends Controller
         ]);
 
         if($request->ajax()){
-            $application = Application::where('user_id', Auth::user()->id)->with('user.profile','type','approvals')->select('applications.*');
+            $application = Application::with('user.profile','type','approvals')->select('applications.*');
             // $application = Application::query();
             return DataTables::of($application)
                 ->addIndexColumn()
@@ -90,7 +89,7 @@ class ApplicationController extends Controller
                 })
                 ->addColumn('actions', function(Application $application){ 
                     $canEdit = ($application->approvals->count() > 0 ? false : true); 
-                    $data = ['entity' => 'application','id' => $application->id,'canEdit' => $canEdit]; 
+                    $data = ['entity' => 'approval','id' => $application->id,'canEdit' => $canEdit]; 
                     return view('shared._actions',$data);
                 })
                 ->rawColumns(['approval','actions'])
@@ -105,22 +104,9 @@ class ApplicationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    { 
-        $profile = $request->user()->profile;
-        $application = new Application;
-        $application->position_id = $profile->position_id;
-        $application->department_id = $profile->department_id;
-        $application->type_id = $profile->type_id;
-        $application->fullname = $profile->fullname;
-        $application->identity_no = $profile->identity_no;
-        $application->phone_no = $profile->phone_no;
-
-        $position = Position::orderBy('name')->pluck('name', 'id');
-        $department = Department::orderBy('name')->pluck('name', 'id');
-        $types = Type::all();
-        
-        return view('application.create',compact('application','position','department','types'));
+    public function create()
+    {
+        //
     }
 
     /**
@@ -131,62 +117,7 @@ class ApplicationController extends Controller
      */
     public function store(Request $request)
     {
-        Validator::extend('typeLimit', function($attribute, $value, $parameters){
-            $typeLimit = Type::find($value)->limit;
-            $application = Application::where('user_id',Auth::user()->id)->where('type_id', $value)->where('is_approve','!=', 'N')->orWhereNull('is_approve')->count();
-            
-            return $application < $typeLimit;
-        },'Anda telah mencapai had permohonan untuk perkara ini.');
-
-        $attributes = [
-            'fullname' => 'nama penuh',
-            'position_id' => 'jawatan',
-            'department_id' => 'bahagian/unit',
-            'identity_no' => 'nombor kad pengnalan',
-            'phone_no' => 'nombor telefon',
-            'type_id' => 'perkara',
-            'attemp' => 'bilangn tuntutan',
-            'notes' => 'catatan',
-            'relationship' => 'hubungan keluarga',
-            'files' => 'dokumen',
-        ];
-
-        $this->validate($request, [
-            'fullname' => 'bail|required',
-            // 'position_id' => 'required|exists:positions,id',
-            // 'department_id' => 'required|exists:departments,id',
-            'identity_no' => 'required|regex: /^\d{6}-\d{2}-\d{4}$/',
-            'phone_no' => 'required|regex:/(01)[0-9]{8,9}/',
-            'type_id' => 'required|typeLimit',
-            'attemp' => 'required_if:type,1',
-            'notes' => 'nullable',
-            'relationship' => 'required_if:type,4',
-            'files' => 'required|array',
-            'files.*' => 'mimes:jpeg,jpg,png,gif,pdf'
-
-        ], [
-            'type_id.required' => 'Ruangan perkara diperlukan, sila pilih perkara',
-            'attemp.required_if' => 'Ruangan tuntutan diperlukan, sila pilih tuntutan',
-            'relationship.required_if' => 'Ruangan hubungan keluarga diperlukan',
-        ], $attributes);
-        
-        $request->merge(['user_id' => $request->user()->id,'is_approve'=>null]);
-        if($application = Application::create($request->except('files','fullname','position_id','department_id','identity_no','phone_no'))) {
-
-            foreach ($request->file('files') as $document) {
-                $fileName = time().'_'.$document->getClientOriginalName();
-                $document->move(public_path('storage/documents/application/'. $request->user()->id .'/'), $fileName);  
-                $file = new File();
-                $file->path = $fileName;
-                $file->application_id = $application->id;
-                $file->save();
-            }
-
-            Session::flash('success', 'Permohonan baru telah berjaya dicipta.');
-        }else{
-            Session::flash('error', 'Permohonan baru tidak dapat dicipta.');
-        }
-        return redirect()->route('application.index');
+        //
     }
 
     /**
@@ -237,52 +168,6 @@ class ApplicationController extends Controller
             Session::flash('success', 'Permohonan telah berjaya dipadam.');
         }else{
             Session::flash('error', 'Permohonan tidak dapat dipadam.');
-        }
-
-        return redirect()->back();
-    }
-
-    public function approve(Request $request,$id)
-    {
-
-        $application = Application::findorFail($id);
-
-        if(Auth::user()->can('approval-treasurer')) {
-            $application->fill($request->except('payment_prove'));
-            if($request->file('payment_prove')){
-                $document = $request->file('payment_prove');
-                $fileName = time().'_'.$document->getClientOriginalName();
-                $document->move(public_path('storage/documents/application/'. $application->user_id .'/'), $fileName);
-                $application->payment_prove = $fileName;
-            }
-            $application->is_approve = 'Y';
-        }
-        $approvalDetails = [
-            'application_id' => $application->id,
-            'user_id' => Auth::user()->id,
-            'status' => 1,
-        ];
-        if($approvals = Approval::create($approvalDetails) && $application->save()) {
-            Session::flash('success', 'Permohonan telah berjaya diluluskan.');
-        }else{
-            Session::flash('error', 'Permohonan tidak dapat diluluskan.');
-        }
-
-        return redirect()->back();
-    }
-
-    public function reject($id)
-    {
-        $application = Application::findorFail($id);
-        $approvalDetails = [
-            'application_id' => $application->id,
-            'user_id' => Auth::user()->id,
-            'status' => 0,
-        ];
-        if($approvals = Approval::create($approvalDetails)) {
-            Session::flash('success', 'Permohonan telah berjaya ditolak.');
-        }else{
-            Session::flash('error', 'Permohonan tidak dapat ditolak.');
         }
 
         return redirect()->back();

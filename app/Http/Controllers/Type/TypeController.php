@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Position;
+namespace App\Http\Controllers\Type;
 
-use App\Position;
+use App\Type;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
 
-class PositionController extends Controller
+class TypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,17 +21,17 @@ class PositionController extends Controller
         $html = $builder->columns([
             ['data' => 'DT_RowIndex', 'name' => 'DT_RowIndex', 'title' => 'No','searchable' => false,'orderable' => false,],
             ['data' => 'name', 'name' => 'name', 'title' => 'Nama','searchable' => true,'orderable' => true,],
-            ['data' => 'description', 'name' => 'description', 'title' => 'Perincian','searchable' => true,'orderable' => true,],
+            ['data' => 'limit', 'name' => 'limit', 'title' => 'Had Permohonan','searchable' => true,'orderable' => true,],
             ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Dicipta Pada','searchable' => false,'orderable' => true,],
             ['data' => 'actions', 'name' => 'actions', 'title' => 'Tindakan','searchable' => false,'orderable' => false,],
         ])
-        ->ajax(['url' => route('position.index'),'type' => 'GET','data' => 'function(d) { d.key = "value"; }'])
+        ->ajax(['url' => route('type.index'),'type' => 'GET','data' => 'function(d) { d.key = "value"; }'])
         ->parameters([
             'autoWidth' => false,
             'columnDefs' => [
                 ['targets' => 0,'width' => '5%',],
                 ['targets' => 1,'width' => '35%','className' => ''],
-                ['targets' => 2,'width' => '30%','className' => ''],
+                ['targets' => 2,'width' => '30%','className' => 'text-center'],
                 ['targets' => 3,'width' => '15%','className' => ''],
                 ['targets' => 4,'width' => '15%','className' => 'text-center'],
             ],
@@ -41,17 +41,17 @@ class PositionController extends Controller
         ]);
 
         if($request->ajax()){
-            $position = Position::query();
-            return DataTables::of($position)
+            $type = Type::query();
+            return DataTables::of($type)
                 ->addIndexColumn()
-                ->addColumn('actions', function(Position $position){  
-                    $data = ['entity' => 'position','id' => $position->id]; 
+                ->addColumn('actions', function(Type $type){  
+                    $data = ['entity' => 'type','id' => $type->id]; 
                     return view('shared._actions',$data);
                 })
                 ->rawColumns(['actions'])
                 ->toJson();
         }
-        return view('position.index',compact('html'));
+        return view('type.index',compact('html'));
     }
 
     /**
@@ -61,7 +61,7 @@ class PositionController extends Controller
      */
     public function create()
     {
-        return view('position.create');
+        //
     }
 
     /**
@@ -72,94 +72,67 @@ class PositionController extends Controller
      */
     public function store(Request $request)
     {
-        $attributes = [
-            'name' => 'nama',
-            'description' => 'perincian',
-        ];
-
-        $this->validate($request, [
-            'name' => 'bail|required|min:2',
-            'description' => 'nullable'
-        ], [], $attributes);
-
-        if($position = Position::create($request->all())) {
-            Session::flash('success', 'Jawatan telah berjaya dicipta.');
-        }else{
-            Session::flash('error', 'Jawatan tidak berjaya dicipta.');
-        }
-
-        return redirect()->route('position.index');
+        //
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Position  $position
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $position = Position::findOrFail($id);
-        return view('position.show',compact('position'));
+        $type = Type::findOrFail($id);
+        return view('type.show',compact('type'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Position  $position
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        $position = Position::findOrFail($id);
-        return view('position.edit',compact('position'));
+        $type = Type::findOrFail($id);
+        return view('type.edit',compact('type'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Position  $position
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $attributes = [
-            'name' => 'nama',
-            'description' => 'perincian',
-        ];
-
         $this->validate($request, [
             'name' => 'bail|required|min:2',
-            'description' => 'nullable'
-        ], [], $attributes);
+            'limit' => 'required|numeric'
+        ]);
 
-        $position = Position::findOrFail($id);
-        $position->fill($request->all());
+        $type = Type::findOrFail($id);
+        $type->fill($request->all());
 
-        if ($position->save()){
-            Session::flash('success', 'Jawatan telah berjaya dikemas kini.');
+        if ($type->save()){
+            Session::flash('success', 'Perkara,jenis permohonan telah berjaya dikemas kini.');
         }else{
-            Session::flash('error', 'Jawatan tidak dapat dikemas kini.');
+            Session::flash('error', 'Perkara,jenis permohonan tidak berjaya dikemas kini.');
         }
 
-        return redirect()->route('position.index');
+        return redirect()->route('type.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Position  $position
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        if(Position::findOrFail($id)->delete()) {
-            Session::flash('success', 'Jawatan telah berjaya dipadam.');
-        }else{
-            Session::flash('error', 'Jawatan tidak dapat dipadam.');
-        }
-
-        return redirect()->back();
+        //
     }
 }
