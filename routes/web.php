@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
         Route::group(['namespace' => 'Roles'], function() {
             Route::group(['prefix' => 'roles'], function() {
                 Route::get('/', 'RoleController@index')->name('roles.index')->middleware('permission:read-roles');
-                Route::get('/create', 'RoleController@create')->name('roles.create')->middleware('permission:create-rolese');
+                Route::get('/create', 'RoleController@create')->name('roles.create')->middleware('permission:create-roles');
                 Route::post('/', 'RoleController@store')->name('roles.store')->middleware('permission:create-roles');
                 Route::get('/{role}', 'RoleController@show')->name('roles.show')->middleware('permission:read-roles');
                 Route::get('/{role}/edit', 'RoleController@edit')->name('roles.edit')->middleware('permission:update-roles');

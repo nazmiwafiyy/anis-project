@@ -133,7 +133,8 @@ class ApplicationController extends Controller
     {
         Validator::extend('typeLimit', function($attribute, $value, $parameters){
             $typeLimit = Type::find($value)->limit;
-            $application = Application::where('user_id',Auth::user()->id)->where('type_id', $value)->where('is_approve','!=', 'N')->orWhereNull('is_approve')->count();
+            $application = Application::where('user_id',Auth::user()->id)->where('type_id', $value)->where(function($query){ $query->orWhere('is_approve',NULL)->orWhere('is_approve','Y');})->count();
+            // $application = Application::where('user_id',Auth::user()->id)->where('type_id', $value)->where('is_approve','!=', 'N')->orWhereNull('is_approve')->count();
             
             return $application < $typeLimit;
         },'Anda telah mencapai had permohonan untuk perkara ini.');
@@ -274,12 +275,13 @@ class ApplicationController extends Controller
     public function reject($id)
     {
         $application = Application::findorFail($id);
+		$application->is_approve = 'N';
         $approvalDetails = [
             'application_id' => $application->id,
             'user_id' => Auth::user()->id,
             'status' => 0,
         ];
-        if($approvals = Approval::create($approvalDetails)) {
+        if($approvals = Approval::create($approvalDetails) && $application->save()) {
             Session::flash('success', 'Permohonan telah berjaya ditolak.');
         }else{
             Session::flash('error', 'Permohonan tidak dapat ditolak.');
