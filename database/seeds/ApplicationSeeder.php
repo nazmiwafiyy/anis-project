@@ -93,16 +93,19 @@ class ApplicationSeeder extends Seeder
         $user = Role::findByName('user');
         $user->givePermissionTo(['create-application','read-application','delete-application']);
 
-        $headDepartmentApproval = Role::findByName('approval-head-department');
-        $headDepartmentApproval->givePermissionTo('approval-head-department','read-approval');
+        $membershipBureau = Role::findByName('membership-bureau');
+        $membershipBureau->givePermissionTo(['create-application','read-application','delete-application']);
 
-        $welfareSocialBureaus = Role::findByName('approval-welfare-social-bureaus');
-        $welfareSocialBureaus->givePermissionTo('approval-welfare-social-bureaus','read-approval');
+        $headDepartmentApproval = Role::findByName('head-department');
+        $headDepartmentApproval->givePermissionTo('approval-head-department','read-approval','create-application','read-application','delete-application');
 
-        $secretarySportsWelfare = Role::findByName('approval-secretary-sports-welfare');
-        $secretarySportsWelfare->givePermissionTo('approval-secretary-sports-welfare','read-approval');
+        $welfareSocialBureaus = Role::findByName('welfare-social-bureaus');
+        $welfareSocialBureaus->givePermissionTo('approval-welfare-social-bureaus','read-approval','create-application','read-application','delete-application');
 
-        $treasurer = Role::findByName('approval-treasurer');
-        $treasurer->givePermissionTo('approval-treasurer','read-approval');
+        $secretarySportsWelfare = Role::findByName('secretary-sports-welfare');
+        $secretarySportsWelfare->givePermissionTo('approval-secretary-sports-welfare','read-approval','create-application','read-application','delete-application');
+
+        $treasurer = Role::findByName('treasurer');
+        $treasurer->givePermissionTo('approval-treasurer','read-approval','create-application','read-application','delete-application');
     }
 }

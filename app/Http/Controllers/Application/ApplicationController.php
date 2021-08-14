@@ -67,14 +67,17 @@ class ApplicationController extends Controller
                     if($isRejected){
                         $bgColor = 'bg-danger';
                         $status = 'Gagal';
+                        $txtColor = 'text-danger';
                     }elseif($approvalCount == 4){
                         $bgColor = 'bg-success';
                         $status = 'Berjaya';
+                        $txtColor = 'text-success';
                     }else{
                         $bgColor = 'bg-primary';
                         $status = 'Dalam Proses';
+                        $txtColor = 'text-primary';
                     }
-                    $approval = $status . '<small class="text-muted float-right">' .$approvalCount. 'of 4</small>
+                    $approval = '<span class = "' . $txtColor . '">' . $status . '</span><small class="text-muted float-right">' .$approvalCount. ' drp. 4</small>
                         <div class="progress progress-xxs">
                             <div class="progress-bar '.$bgColor.'" style="width: '. ($approvalCount/4)*100 .'%"></div>
                         </div>';
@@ -119,8 +122,19 @@ class ApplicationController extends Controller
         $position = Position::orderBy('name')->pluck('name', 'id');
         $department = Department::orderBy('name')->pluck('name', 'id');
         $types = Type::all();
-        
-        return view('application.create',compact('application','position','department','types'));
+        $limit = [];
+        foreach($types as $type){
+            $typeLimit = $type->limit;
+            $checkApplication = Application::where('user_id',Auth::user()->id)->where('type_id', $type->id)->where(function($query){ $query->orWhere('is_approve',NULL)->orWhere('is_approve','Y');})->count();
+                
+            if($checkApplication < $typeLimit){
+                $limit[$type->id] = false;
+            }else{
+                $limit[$type->id] = true;
+            }
+        }
+
+        return view('application.create',compact('application','position','department','types','limit'));
     }
 
     /**
@@ -272,9 +286,10 @@ class ApplicationController extends Controller
         return redirect()->back();
     }
 
-    public function reject($id)
+    public function reject(Request $request ,$id)
     {
         $application = Application::findorFail($id);
+        $application->fill($request->all());
 		$application->is_approve = 'N';
         $approvalDetails = [
             'application_id' => $application->id,

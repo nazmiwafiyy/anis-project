@@ -25,7 +25,7 @@
                     @include('application._form')
                     <div class="clearfix">
                         <div class="float-right">
-                            {!! Form::button('<i class="fa fa-check"></i> Simpan', ['type' => 'submit', 'class' => 'btn btn-primary btn-sm'] )  !!}
+                            {!! Form::button('<i class="fa fa-check"></i> Simpan', ['type' => 'submit', 'class' => 'btn btn-primary btn-sm','id'=>'save-button'] )  !!}
                         </div>
                     </div>
                     {{-- {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!} --}}
@@ -48,6 +48,7 @@
             bsCustomFileInput.init();
 
             $('.files-div').hide();
+            $('#save-button').hide();
 
             $('.handleType').each(function(event) {
                 var content = $(this).attr('id');
@@ -58,6 +59,7 @@
                     $('.'+content).hide().find(':input').prop('disabled', true);
                 }else{
                     $('.files-div').show();
+                    $('#save-button').show();
                 }
             });
 
@@ -75,6 +77,7 @@
                 });
                 $('.'+content).show().find(':input').prop('disabled', false);
                 $('.files-div').show();
+                $('#save-button').show();
             });
         });
     </script>

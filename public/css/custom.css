@@ -101,3 +101,7 @@ select.no-border:disabled{
   color: black;
   border-color:unset;
 }
+
+blockquote {
+  border-left: .7rem solid #dc3545 !important;
+}

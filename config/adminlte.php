@@ -127,7 +127,7 @@ return [
     'classes_content_header' => '',
     'classes_content' => '',
     'classes_sidebar' => 'sidebar-dark-primary elevation-4',
-    'classes_sidebar_nav' => '',
+    'classes_sidebar_nav' => 'nav-compact nav-child-indent',
     'classes_topnav' => 'navbar-white navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
@@ -253,6 +253,71 @@ return [
             'active' => ['application','regex:@^application/[0-9]+$@'],
         ],
         [
+            'header' => 'DALAM TINDAKAN',
+            // 'can'  => ['approval-head-department','approval-welfare-social-bureaus','approval-secretary-sports-welfare','approval-treasurer'],
+            'can'  => ['read-approval'],
+        ],
+        [
+            'text' => 'Senarai Permohonan',
+            'route'  => 'approval.index',
+            // 'url'  => 'admin/settings',
+            'icon' => 'far fa-list-alt',
+            // 'can'  => ['approval-head-department','approval-welfare-social-bureaus','approval-secretary-sports-welfare','approval-treasurer'],
+            'can'  => ['read-approval'],
+            'active' => ['approval','regex:@^approval/[0-9]+$@'],
+            // 'label' => 2,
+            // 'label_color' => 'info',
+            'key' => 'application_list',
+        ],
+        [
+            'header' => 'LAPORAN',
+            'can'  => ['supported-application-report','unsupported-application-report','approved-application-report','rejected-application-report','paid-application-report','users-report'],
+        ],
+        [
+            'text' => 'Laporan Pengguna Sistem',
+            'route'  => 'report.users',
+            // 'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-file-import',
+            'can'  => ['users-report'],
+        ],        
+        [
+            'text' => 'Laporan Permohonan',
+            'icon' => 'fas fa-fw fa-file-signature',
+            'can'  => ['supported-application-report','unsupported-application-report','approved-application-report','rejected-application-report','paid-application-report'],
+            'submenu' => [
+                [
+                    'text' => 'Disokong',
+                    'route'  => 'report.supported',
+                    'icon' => 'fas fa-fw fa-user-check',
+                    'can'  => ['supported-application-report'],
+                ],
+                [
+                    'text' => 'Tidak Disokong',
+                    'route'  => 'report.unsupported',
+                    'icon' => 'fas fa-fw fa-user-times',
+                    'can'  => ['unsupported-application-report'],
+                ],
+                [
+                    'text' => 'Diluluskan',
+                    'route'  => 'report.approved',
+                    'icon' => 'fas fa-fw fa-check-circle',
+                    'can'  => ['approved-application-report'],
+                ],
+                [
+                    'text' => 'Tidak Diluluskan',
+                    'route'  => 'report.rejected',
+                    'icon' => 'fas fa-fw fa-times-circle',
+                    'can'  => ['rejected-application-report'],
+                ],
+                [
+                    'text' => 'Telah Menerima Bayaran',
+                    'route'  => 'report.paid',
+                    'icon' => 'fas fa-fw fa-file-invoice-dollar',
+                    'can'  => ['paid-application-report'],
+                ],
+            ],
+        ],
+        [
             'header' => 'TETAPAN PENGGUNA',
             'can'  => ['read-users','read-roles'],
         ],
@@ -297,20 +362,6 @@ return [
             'icon' => 'fab fa-wpforms',
             'can'  => 'read-type',
             'active' => ['type*',]
-        ],
-        [
-            'header' => 'DALAM TINDAKAN',
-            // 'can'  => ['approval-head-department','approval-welfare-social-bureaus','approval-secretary-sports-welfare','approval-treasurer'],
-            'can'  => ['read-approval'],
-        ],
-        [
-            'text' => 'Senarai Permohonan',
-            'route'  => 'approval.index',
-            // 'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-tasks',
-            // 'can'  => ['approval-head-department','approval-welfare-social-bureaus','approval-secretary-sports-welfare','approval-treasurer'],
-            'can'  => ['read-approval'],
-            'active' => ['approval*',]
         ],
     ],
 
@@ -366,6 +417,26 @@ return [
                     'type' => 'css',
                     'asset' => false,
                     'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/buttons/1.7.1/css/buttons.bootstrap4.min.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/buttons/1.7.1/js/buttons.bootstrap4.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/datatables/buttons.server-side.js',
                 ],
             ],
         ],

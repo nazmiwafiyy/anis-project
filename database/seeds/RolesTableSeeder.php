@@ -56,29 +56,35 @@ class RolesTableSeeder extends Seeder
             'name' => 'admin',
             'display_name' => 'Admin'
         ]);
+
         $user = Role::create([
             'name' => 'user',
-            'display_name' => 'Pengguna biasa'
+            'display_name' => 'Ahli Kelab JKMM'
+        ]);
+
+        $membershipBureau = Role::create([
+            'name' => 'membership-bureau',
+            'display_name' => 'Biro Keahlian Kelab JKMM'
         ]);
 
         $headDepartmentApproval = Role::create([
-            'name' => 'approval-head-department',
-            'display_name' => 'Meluluskan(Ketua Jabatan)'
+            'name' => 'head-department',
+            'display_name' => 'Ketua Jabatan'
         ]);
 
         $welfareSocialBureaus = Role::create([
-            'name' => 'approval-welfare-social-bureaus',
-            'display_name' => 'Meluluskan(Biro Kebajikan dan Sosial)'
+            'name' => 'welfare-social-bureaus',
+            'display_name' => 'Biro Kebajikan dan Sosial Kelab JKMM'
         ]);
 
         $secretarySportsWelfare  = Role::create([
-            'name' => 'approval-secretary-sports-welfare',
-            'display_name' => 'Meluluskan(Setiausaha / Penolong Setiausha Kelab Sukan dan Kebajikan JKMM)'
+            'name' => 'secretary-sports-welfare',
+            'display_name' => 'Setiausaha / Penolong Setiausha Kelab Sukan dan Kebajikan Kelab JKMM'
         ]);
 
         $treasurer = Role::create([
-            'name' => 'approval-treasurer',
-            'display_name' => 'Meluluskan(Bendahari / Penolong Bendahari)'
+            'name' => 'treasurer',
+            'display_name' => 'Bendahari / Penolong Bendahari Kelab JKMM'
         ]);
 
         // Assign permissions

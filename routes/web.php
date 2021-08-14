@@ -39,12 +39,13 @@ Route::middleware('auth')->group(function () {
                 // Route::put('/{application}', 'ApplicationController@update')->name('application.update')->middleware('permission:update-application');
                 Route::delete('/{application}', 'ApplicationController@destroy')->name('application.destroy')->middleware('permission:delete-application');
                 Route::post('approve/{application}', 'ApplicationController@approve')->name('application.approve');
-                Route::get('reject/{application}', 'ApplicationController@reject')->name('application.reject');
+                Route::post('reject/{application}', 'ApplicationController@reject')->name('application.reject');
 
             });
 
             Route::group(['prefix' => 'approval'], function() {
                 Route::get('/', 'ApprovalController@index')->name('approval.index')->middleware('permission:read-approval');
+                Route::get('/action', 'ApprovalController@needAction')->name('approval.action')->middleware('permission:read-approval');
                 Route::get('/{approval}', 'ApprovalController@show')->name('approval.show')->middleware('permission:read-approval');
                 Route::delete('/{approval}', 'ApprovalController@destroy')->name('approval.destroy')->middleware('permission:delete-approval');
             });
@@ -116,6 +117,17 @@ Route::middleware('auth')->group(function () {
                 Route::get('/{type}', 'TypeController@show')->name('type.show')->middleware('permission:read-type');
                 Route::get('/{type}/edit', 'TypeController@edit')->name('type.edit')->middleware('permission:update-type');
                 Route::put('/{type}', 'TypeController@update')->name('type.update')->middleware('permission:update-type');
+            });
+        });
+
+        Route::group(['namespace' => 'Report'], function() {
+            Route::group(['prefix' => 'report'], function() {
+                Route::get('/users', 'ReportController@getUsers')->name('report.users')->middleware('permission:users-report');
+                Route::get('/supported-application', 'ReportController@getSupportedApplication')->name('report.supported')->middleware('permission:supported-application-report');
+                Route::get('/unsupported-application', 'ReportController@getUnsupportedApplication')->name('report.unsupported')->middleware('permission:unsupported-application-report');
+                Route::get('/approved-application', 'ReportController@getApprovedApplication')->name('report.approved')->middleware('permission:approved-application-report');
+                Route::get('/rejected-application', 'ReportController@getRejectedApplication')->name('report.rejected')->middleware('permission:rejected-application-report');
+                Route::get('/paid-application', 'ReportController@getPaiddApplication')->name('report.paid')->middleware('permission:paid-application-report');
             });
         });
 

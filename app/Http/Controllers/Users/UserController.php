@@ -9,6 +9,7 @@ use App\Profile;
 use Illuminate\Http\Request;
 
 use Yajra\DataTables\DataTables;
+// use Yajra\DataTables\Html\Button;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Html\Builder;
 use App\Http\Controllers\Controller;
@@ -40,8 +41,13 @@ class UserController extends Controller
                 ['targets' => 4,'width' => '15%','className' => 'text-center'],
             ],
             'language' => ['url' => url('//cdn.datatables.net/plug-ins/1.10.24/i18n/Malay.json')],
-            'order' => [3,'asc']
-
+            'order' => [3,'asc'],
+            // 'dom' => 'Blfrtip',
+            // 'dom' => "<'row'<'col-sm-12 mb-2'<'float-right'B>>>".
+            //     "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" .
+            //     "<'row'<'col-sm-12'tr>>" .
+            //     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            // 'buttons' => ['export'],
         ]);
 
         if($request->ajax()){

@@ -37,7 +37,7 @@ class RoleController extends Controller
                 ['targets' => 4,'width' => '15%','className' => 'text-center'],
             ],
             'language' => ['url' => url('//cdn.datatables.net/plug-ins/1.10.24/i18n/Malay.json')],
-            'order' => [3,'desc']
+            'order' => [3,'asc']
 
         ]);
 

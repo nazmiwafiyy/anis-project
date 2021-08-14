@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Application;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
+use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -29,6 +32,27 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
+        Event::listen(BuildingMenu::class, function (BuildingMenu $event) {
+
+            $application = Application::whereNull('is_approve')->get();
+            $userLevel = Auth::user()->approvalLevel();
+            $count = 0;
+            foreach($application as $app){
+                $currentLevel = $app->currentApproveLevel();
+                if($userLevel == $currentLevel+1){
+                    $count++;
+                }
+            }
+
+            $event->menu->addAfter('application_list', [
+                'text' => 'Memerlukan Tidakan',
+                'route'  => 'approval.action',
+                'icon' => 'fas fa-fw fa-tasks',
+                'can'  => ['read-approval'],
+                // 'active' => ['approval*',],
+                'label' => $count,
+                'label_color' => 'info'
+            ]);
+        });
     }
 }

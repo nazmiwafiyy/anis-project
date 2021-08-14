@@ -32,7 +32,7 @@
     {!! Form::hidden('type_id', null, ['id' => 'type']) !!}
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         @foreach ($types as $type)
-            <a id="{{ $type->slug }}" data-type-id = "{{ $type->id }}" class="dropdown-item handleType">{{ $type->name }}</a>
+            <a id="{{ $type->slug }}" data-type-id = "{{ $type->id }}" class="dropdown-item handleType {{ array_key_exists($type->id,$limit) && $limit[$type->id] ? 'disabled' : ''}}">{{ $type->name }}</a>
         @endforeach
     </div>
     <br>

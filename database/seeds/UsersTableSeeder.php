@@ -53,7 +53,9 @@ class UsersTableSeeder extends Seeder
 
         $roleAdmin = Role::findByName('admin');
         $roleAdmin->givePermissionTo(['read-users','create-users','update-users','delete-users']);
-
+        
+        $membershipBureau = Role::findByName('membership-bureau');
+        $membershipBureau->givePermissionTo(['read-users','create-users','update-users','delete-users']);
 
         // Create default super-admin
         $superAdmin = \App\User::create([
@@ -101,13 +103,28 @@ class UsersTableSeeder extends Seeder
         ]);
 
         // Create demo user
+        $membership = \App\User::create([
+            'name' => 'Demo Keahlian',
+            'email' => 'keahlian@localhost.com',
+            'password' => bcrypt('password'),
+            'avatar' => 'avatar.png'
+        ]);
+        $membership->assignRole('membership-bureau');
+        $avatar = Avatar::create($membership->name)->getImageObject()->encode('png');
+        Storage::disk('public')->put('avatars/'.$membership->id.'/avatar.png', (string) $avatar);
+        $membershipProfile = \App\Profile::create([
+            'fullname' => 'Test User',
+            'user_id'  => $membership->id
+        ]);
+
+        // Create demo user
         $approval_1 = \App\User::create([
             'name' => 'Demo Kelulusan 1',
             'email' => 'approval_1@localhost.com',
             'password' => bcrypt('password'),
             'avatar' => 'avatar.png'
         ]);
-        $approval_1->assignRole(['user','approval-head-department']);
+        $approval_1->assignRole(['head-department']);
         $avatar = Avatar::create($approval_1->name)->getImageObject()->encode('png');
         Storage::disk('public')->put('avatars/'.$approval_1->id.'/avatar.png', (string) $avatar);
         $approval1Profile = \App\Profile::create([
@@ -122,7 +139,7 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('password'),
             'avatar' => 'avatar.png'
         ]);
-        $approval_2->assignRole(['user','approval-welfare-social-bureaus']);
+        $approval_2->assignRole(['welfare-social-bureaus']);
         $avatar = Avatar::create($approval_2->name)->getImageObject()->encode('png');
         Storage::disk('public')->put('avatars/'.$approval_2->id.'/avatar.png', (string) $avatar);
         $approval2Profile = \App\Profile::create([
@@ -136,7 +153,7 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('password'),
             'avatar' => 'avatar.png'
         ]);
-        $approval_3->assignRole(['user','approval-secretary-sports-welfare']);
+        $approval_3->assignRole(['secretary-sports-welfare']);
         $avatar = Avatar::create($approval_3->name)->getImageObject()->encode('png');
         Storage::disk('public')->put('avatars/'.$approval_3->id.'/avatar.png', (string) $avatar);
         $approval3Profile = \App\Profile::create([
@@ -150,7 +167,7 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('password'),
             'avatar' => 'avatar.png'
         ]);
-        $approval_4->assignRole(['user','approval-treasurer']);
+        $approval_4->assignRole(['treasurer']);
         $avatar = Avatar::create($approval_4->name)->getImageObject()->encode('png');
         Storage::disk('public')->put('avatars/'.$approval_4->id.'/avatar.png', (string) $avatar);
         $approval4Profile = \App\Profile::create([

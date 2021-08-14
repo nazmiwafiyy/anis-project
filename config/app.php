@@ -106,7 +106,7 @@ return [
     |
     */
 
-    'faker_locale' => 'en_US',
+    'faker_locale' => 'ms_MY',
 
     /*
     |--------------------------------------------------------------------------
@@ -169,6 +169,7 @@ return [
         Yajra\DataTables\DataTablesServiceProvider::class,
         RealRashid\SweetAlert\SweetAlertServiceProvider::class,
         // HTMLMin\HTMLMin\HTMLMinServiceProvider::class,
+        Barryvdh\Snappy\ServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -232,7 +233,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Alert' => RealRashid\SweetAlert\Facades\Alert::class,
         // 'HTMLMin' => HTMLMin\HTMLMin\Facades\HTMLMin::class,
-        'Image' => Intervention\Image\Facades\Image::class
+        'Image' => Intervention\Image\Facades\Image::class,
+        'PDF' => Barryvdh\Snappy\Facades\SnappyPdf::class,
     ],
 
 ];

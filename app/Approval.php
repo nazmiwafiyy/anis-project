@@ -18,4 +18,8 @@ class Approval extends Model
     public function approved_by(){
         return $this->hasOne(User::class,'id','user_id');
     }
+
+    // public function approved_by_welfare_social_bureaus(){
+    //     return $this->hasOne(User::class,'id','user_id')->where;
+    // }
 }

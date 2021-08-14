@@ -27,7 +27,8 @@
             @canany(['approval-head-department', 'approval-welfare-social-bureaus', 'approval-secretary-sports-welfare','approval-treasurer'])
             @if ($approvalCount < 4 && !$isRejected && $userLevel == $currentLevel+1)
                 @if (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()))
-                    <a href="{{ route('application.reject',$application->id) }}" class="btn btn-danger btn-sm "><i class="fas fa-fw fa-times"></i>Tolak permohonan</a>
+                    {{-- <a href="{{ route('application.reject',$application->id) }}" class="btn btn-danger btn-sm "><i class="fas fa-fw fa-times"></i>Tolak permohonan</a> --}}
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal"><i class="fas fa-fw fa-times"></i>Tolak Permohonan</button>
                     @if ($userLevel == 4)
                         <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</button>
                     @else
@@ -88,6 +89,29 @@
                             </label>
                             <input name="payment_prove" type="file" class="custom-file-input form-control-sm" multiple="">
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form method="POST" action="{{ route('application.reject',$application->id) }}" enctype="multipart/form-data">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Sebab Penolakan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        {!! csrf_field() !!}
+                        {{-- <input type="hidden" name="id" value="{!! $application->id !!}" /> --}}
+                        <textarea name="reject_reason" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -172,6 +196,11 @@
                             @endif
                         </div>
                     </div>
+                    @if($application->is_approve == 'N')
+                        <blockquote class="blockquote">
+                            <footer class="blockquote-footer">{{$application->reject_reason}}</footer>
+                        </blockquote>
+                    @endif
                 </div>
             </div>
             <div class="card">

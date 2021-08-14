@@ -20,11 +20,15 @@ class Profile extends Model
 
     public function position()
     {
-        return $this->belongsTo(Position::class);
+        return $this->belongsTo(Position::class)->withDefault([
+            'name' => ''
+        ]);
     }
 
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class)->withDefault([
+            'name' => ''
+        ]);
     }
 }
