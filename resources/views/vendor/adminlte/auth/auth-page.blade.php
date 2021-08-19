@@ -9,6 +9,16 @@
 @endif
 
 @section('adminlte_css')
+    <style>
+        body {
+            background: url('logo/login-bg.png') no-repeat center center fixed !important; 
+            -webkit-background-size: cover !important;
+            -moz-background-size: cover !important;
+            -o-background-size: cover !important;
+            background-size: cover !important;
+        }
+    </style>
+
     @stack('css')
     @yield('css')
 @stop

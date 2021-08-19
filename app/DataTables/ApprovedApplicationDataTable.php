@@ -46,6 +46,10 @@ class ApprovedApplicationDataTable extends DataTable
         return $model->newQuery()
             ->whereHas('approvals', function ($query) {
                 return $query->where('status',1)
+                    ->where(function ($query) {
+                        $query->whereNull('su_approval')
+                            ->orWhere('su_level',3);
+                    })
                     ->with('approved_by')
                     ->whereHas('approved_by', function ($query){ 
                         $query->permission('approval-secretary-sports-welfare'); 

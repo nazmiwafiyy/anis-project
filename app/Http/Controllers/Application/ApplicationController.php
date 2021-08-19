@@ -9,6 +9,7 @@ use App\Position;
 use App\Department;
 use App\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
 use App\Http\Controllers\Controller;
@@ -63,7 +64,7 @@ class ApplicationController extends Controller
                 })
                 ->addColumn('approval', function(Application $application){
                     $approvalCount = $application->approvals->where('status', 1)->count();
-                    $isRejected = $application->approvals->where('status', 0)->count() > 0 ? true : false;
+                    $isRejected = $application->is_approve == 'N' || $application->approvals->where('status', 0)->count() > 0 ? true : false;
                     if($isRejected){
                         $bgColor = 'bg-danger';
                         $status = 'Gagal';
@@ -295,6 +296,97 @@ class ApplicationController extends Controller
             'application_id' => $application->id,
             'user_id' => Auth::user()->id,
             'status' => 0,
+        ];
+        if($approvals = Approval::create($approvalDetails) && $application->save()) {
+            Session::flash('success', 'Permohonan telah berjaya ditolak.');
+        }else{
+            Session::flash('error', 'Permohonan tidak dapat ditolak.');
+        }
+
+        return redirect()->back();
+    }
+
+    public function approveSu(Request $request ,$id)
+    {
+        $application = Application::findorFail($id);
+        $approvalDetails = [];
+        $now = Carbon::now('utc')->toDateTimeString();
+        
+        if($request->input('level-1') == 'on'){
+            $approvalDetails[] = [
+                'application_id' => $application->id,
+                'user_id' => Auth::user()->id,
+                'status' => 1,
+                'su_approval' => 1,
+                'su_level' => 1,
+                'created_at'=> $now,
+                'updated_at'=> $now
+            ];
+        }
+        if($request->input('level-2') == 'on'){
+            $approvalDetails[] = [
+                'application_id' => $application->id,
+                'user_id' => Auth::user()->id,
+                'status' => 1,
+                'su_approval' => 1,
+                'su_level' => 2,
+                'created_at'=> $now,
+                'updated_at'=> $now
+            ];
+        }
+        if($request->input('level-3') == 'on'){
+            $approvalDetails[] = [
+                'application_id' => $application->id,
+                'user_id' => Auth::user()->id,
+                'status' => 1,
+                'su_approval' => 1,
+                'su_level' => 3,
+                'created_at'=> $now,
+                'updated_at'=> $now
+            ];
+        }
+        if($request->input('level-4') == 'on'){
+            $approvalDetails[] = [
+                'application_id' => $application->id,
+                'user_id' => Auth::user()->id,
+                'status' => 1,
+                'su_approval' => 1,
+                'su_level' => 4,
+                'created_at'=> $now,
+                'updated_at'=> $now
+            ];
+
+            $application->fill(['payment' => $request->input('payment'),'payment_date' => $request->input('payment_date')]);
+            if($request->file('payment_prove')){
+                $document = $request->file('payment_prove');
+                $fileName = time().'_'.$document->getClientOriginalName();
+                $document->move(public_path('storage/documents/application/'. $application->user_id .'/'), $fileName);
+                $application->payment_prove = $fileName;
+            }
+            $application->is_approve = 'Y';
+        }
+
+        if($approvals = Approval::insert($approvalDetails) && $application->save()) {
+            Session::flash('success', 'Permohonan telah berjaya diluluskan.');
+        }else{
+            Session::flash('error', 'Permohonan tidak dapat diluluskan.');
+        }
+
+        return redirect()->back();
+    }    
+    
+    public function rejectSu(Request $request ,$id)
+    {
+        $application = Application::findorFail($id);
+        $currentLevel = $application->currentApproveLevel();
+        $application->fill($request->all());
+		$application->is_approve = 'N';
+        $approvalDetails = [
+            'application_id' => $application->id,
+            'user_id' => Auth::user()->id,
+            'status' => 0,
+            'su_approval' => 1,
+            'su_level' => $currentLevel+1,
         ];
         if($approvals = Approval::create($approvalDetails) && $application->save()) {
             Session::flash('success', 'Permohonan telah berjaya ditolak.');

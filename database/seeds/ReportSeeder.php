@@ -28,6 +28,18 @@ class ReportSeeder extends Seeder
                 'module_id' => $moduleId
             ],
             [
+                'display_name' => 'Permohonan Disahkan',
+                'name' => 'confirmed-application-report',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'display_name' => 'Permohonan Tidak Disahkan',
+                'name' => 'unconfirmed-application-report',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
                 'display_name' => 'Permohonan Disokong',
                 'name' => 'supported-application-report',
                 'guard_name' => 'web',
@@ -64,10 +76,13 @@ class ReportSeeder extends Seeder
         $superAdmin->givePermissionTo(Permission::all());
 
         $admin = Role::findByName('admin');
-        $admin->givePermissionTo(['users-report','supported-application-report','unsupported-application-report','approved-application-report','rejected-application-report','paid-application-report']);
+        $admin->givePermissionTo(['users-report','confirmed-application-report','unconfirmed-application-report','supported-application-report','unsupported-application-report','approved-application-report','rejected-application-report','paid-application-report']);
         
         $membershipBureau = Role::findByName('membership-bureau');
         $membershipBureau->givePermissionTo('users-report');
+
+        $headDepartment = Role::findByName('head-department');
+        $headDepartment->givePermissionTo('confirmed-application-report','unconfirmed-application-report');
 
         $welfareSocialBureaus = Role::findByName('welfare-social-bureaus');
         $welfareSocialBureaus->givePermissionTo('supported-application-report','unsupported-application-report');

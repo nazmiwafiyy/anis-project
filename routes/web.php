@@ -38,8 +38,10 @@ Route::middleware('auth')->group(function () {
                 // Route::get('/{application}/edit', 'ApplicationController@edit')->name('application.edit')->middleware('permission:update-application');
                 // Route::put('/{application}', 'ApplicationController@update')->name('application.update')->middleware('permission:update-application');
                 Route::delete('/{application}', 'ApplicationController@destroy')->name('application.destroy')->middleware('permission:delete-application');
-                Route::post('approve/{application}', 'ApplicationController@approve')->name('application.approve');
-                Route::post('reject/{application}', 'ApplicationController@reject')->name('application.reject');
+                Route::post('approve/{application}', 'ApplicationController@approve')->name('application.approve')->middleware('permission:approval-head-department|approval-welfare-social-bureaus|approval-secretary-sports-welfare|approval-treasurer');
+                Route::post('reject/{application}', 'ApplicationController@reject')->name('application.reject')->middleware('permission:approval-head-department|approval-welfare-social-bureaus|approval-secretary-sports-welfare|approval-treasurer');
+                Route::post('su-reject/{application}', 'ApplicationController@rejectSu')->name('application.reject.su')->middleware('role:super-admin');
+                Route::post('su-approve/{application}', 'ApplicationController@approveSu')->name('application.approve.su')->middleware('role:super-admin');
 
             });
 
@@ -123,6 +125,8 @@ Route::middleware('auth')->group(function () {
         Route::group(['namespace' => 'Report'], function() {
             Route::group(['prefix' => 'report'], function() {
                 Route::get('/users', 'ReportController@getUsers')->name('report.users')->middleware('permission:users-report');
+                Route::get('/confirmed-application', 'ReportController@getConfirmedApplication')->name('report.confirmed')->middleware('permission:confirmed-application-report');
+                Route::get('/unconfirmed-application', 'ReportController@getUnconfirmedApplication')->name('report.unconfirmed')->middleware('permission:unconfirmed-application-report');
                 Route::get('/supported-application', 'ReportController@getSupportedApplication')->name('report.supported')->middleware('permission:supported-application-report');
                 Route::get('/unsupported-application', 'ReportController@getUnsupportedApplication')->name('report.unsupported')->middleware('permission:unsupported-application-report');
                 Route::get('/approved-application', 'ReportController@getApprovedApplication')->name('report.approved')->middleware('permission:approved-application-report');

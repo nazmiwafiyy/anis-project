@@ -283,8 +283,20 @@ return [
         [
             'text' => 'Laporan Permohonan',
             'icon' => 'fas fa-fw fa-file-signature',
-            'can'  => ['supported-application-report','unsupported-application-report','approved-application-report','rejected-application-report','paid-application-report'],
+            'can'  => ['confirmed-application-report','unconfirmed-application-report','supported-application-report','unsupported-application-report','approved-application-report','rejected-application-report','paid-application-report'],
             'submenu' => [
+                [
+                    'text' => 'Disahkan',
+                    'route'  => 'report.confirmed',
+                    'icon' => 'fas fa-fw fa-user-check',
+                    'can'  => ['confirmed-application-report'],
+                ],
+                [
+                    'text' => 'Tidak Disahkan',
+                    'route'  => 'report.unconfirmed',
+                    'icon' => 'fas fa-fw fa-user-times',
+                    'can'  => ['unconfirmed-application-report'],
+                ],
                 [
                     'text' => 'Disokong',
                     'route'  => 'report.supported',
@@ -567,6 +579,16 @@ return [
                     'type' => 'css',
                     'asset' => true,
                     'location' => 'vendor/daterangepicker/daterangepicker.css',
+                ],
+            ],
+        ],
+        'iCheck' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'vendor/icheck-bootstrap/icheck-bootstrap.min.css',
                 ],
             ],
         ],

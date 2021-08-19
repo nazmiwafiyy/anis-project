@@ -19,6 +19,6 @@
 
 <div class="form-group">
     {!! Form::label('roles[]', 'Peranan',['class'=>'required']) !!}
-    {!! Form::select('roles[]', $roles, isset($user) ? $user->roles->pluck('id')->toArray() : null,  ['class' => 'form-control select2'.($errors->has('roles') ? ' is-invalid' : null), 'multiple']) !!}
+    {!! Form::select('roles[]', $roles, isset($user) ? $user->roles->pluck('id')->toArray() : null,  ['class' => 'form-control select2'.($errors->has('roles') ? ' is-invalid' : null)]) !!}
     @if ($errors->has('roles')) <small class="help-block text-danger">{{ $errors->first('roles') }}</small> @endif
 </div>

@@ -39,13 +39,16 @@ class EventServiceProvider extends ServiceProvider
             $count = 0;
             foreach($application as $app){
                 $currentLevel = $app->currentApproveLevel();
-                if($userLevel == $currentLevel+1){
+                if(($userLevel == $currentLevel+1 && $currentLevel == 0 && Auth::user()->profile->department->id == $app->user->profile->department->id) || $userLevel == 99){
+                    $count++;
+                }
+                elseif(($userLevel == $currentLevel+1 && $currentLevel > 0) || $userLevel == 99){
                     $count++;
                 }
             }
 
             $event->menu->addAfter('application_list', [
-                'text' => 'Memerlukan Tidakan',
+                'text' => 'Memerlukan Tindakan',
                 'route'  => 'approval.action',
                 'icon' => 'fas fa-fw fa-tasks',
                 'can'  => ['read-approval'],

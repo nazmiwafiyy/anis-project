@@ -3,13 +3,19 @@
 namespace App;
 
 use App\Application;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Type extends Model
 {
-    protected $casts = [
-        'created_at' => 'datetime:d-m-Y g:i A',
-    ];
+    // protected $casts = [
+    //     'created_at' => 'datetime:d-m-Y g:i A',
+    // ];
+
+    public function getCreatedAtAttribute()
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $this->attributes['created_at'],'UTC')->setTimezone('Asia/Kuala_Lumpur')->format('d-m-Y g:i A');
+    }
 
     protected $guarded = ['id'];
 

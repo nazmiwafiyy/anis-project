@@ -4,6 +4,7 @@ namespace App;
 
 use App\Profile;
 use App\Application;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
@@ -41,8 +42,13 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'created_at' => 'datetime:d-m-Y g:i A',
+        // 'created_at' => 'datetime:d-m-Y g:i A',
     ];
+
+    public function getCreatedAtAttribute()
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $this->attributes['created_at'],'UTC')->setTimezone('Asia/Kuala_Lumpur')->format('d-m-Y g:i A');
+    }
 
     protected $dates = ['deleted_at'];
 
@@ -79,7 +85,9 @@ class User extends Authenticatable
 
     public function approvalLevel()
     {
-        if($this->hasPermissionTo('approval-head-department')){
+        if($this->hasRole('super-admin')){
+            return 99;
+        }elseif($this->hasPermissionTo('approval-head-department')){
             return 1;
         }elseif($this->hasPermissionTo('approval-welfare-social-bureaus')){
             return 2;

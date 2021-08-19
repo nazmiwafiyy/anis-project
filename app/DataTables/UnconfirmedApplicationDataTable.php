@@ -5,11 +5,12 @@ namespace App\DataTables;
 use App\Application;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class PaidApplicationDataTable extends DataTable
+class UnconfirmedApplicationDataTable extends DataTable
 {
     protected $printPreview = 'transactions.print';
 
@@ -23,35 +24,49 @@ class PaidApplicationDataTable extends DataTable
     {
         return datatables()
             ->eloquent($query)
-            // ->addColumn('action', 'paidapplicationdatatable.action');
-            ->addColumn('payment', function(Application $application){  
-                return 'RM ' . $application->payment;
+            // ->addColumn('action', 'unsupportedapplicationdatatable.action');
+            ->addColumn('is_approve', function(Application $application){  
+                if($application->is_approve == 'Y'){
+                    return 'Berjaya';
+                }elseif($application->is_approve == 'N'){
+                    return 'Gagal';
+                }else{
+                    return 'Dalam Proses';
+                }
             });
     }
 
     /**
      * Get query source of dataTable.
      *
-     * @param \App\App\PaidApplicationDataTable $model
+     * @param \App\App\UnsupportedApplicationDataTable $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(Application $model)
     {
-        return $model->newQuery()
-            ->whereHas('approvals', function ($query) {
-                return $query->where('status',1)
-                    ->where(function ($query) {
-                        $query->whereNull('su_approval')
-                            ->orWhere('su_level',4);
-                    })
-                    ->with('approved_by')
-                    ->whereHas('approved_by', function ($query){ 
-                        $query->permission('approval-treasurer'); 
-                    });
-                    // ->approved_by()->permission('approval-welfare-social-bureaus');
-            })
-            ->with('user.profile','user.profile.department','user.profile.position','type')
-            ->select('applications.*');
+        $model = $model->newQuery()
+        ->whereHas('approvals', function ($query) {
+            return $query->where('status',0)
+                ->where(function ($query) {
+                    $query->whereNull('su_approval')
+                        ->orWhere('su_level',1);
+                })
+                ->with('approved_by')
+                ->whereHas('approved_by', function ($query){ 
+                    $query->permission('approval-head-department'); 
+                });
+        })
+        ->with('user.profile','user.profile.department','user.profile.position','type')
+        ->select('applications.*');
+
+        $user = Auth::user();
+        if($user->hasPermissionTo('approval-head-department') && !$user->hasRole('super-admin')){
+            $model =  $model->whereHas('user.profile.department',function($query) use ($user){
+                    $query->where('id', $user->profile->department->id);
+                });
+        }
+        
+        return $model;
     }
 
     /**
@@ -62,7 +77,7 @@ class PaidApplicationDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-                    ->setTableId('paidapplicationdatatable-table')
+                    ->setTableId('unsupportedapplicationdatatable-table')
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     ->dom("<'row'<'col-sm-12 mb-2'<'float-right'B>>>".
@@ -99,9 +114,8 @@ class PaidApplicationDataTable extends DataTable
             Column::make('user.profile.phone_no')->title('No. Telefon'),
             Column::make('user.profile.position.name')->title('Jawatan'),
             Column::make('user.profile.department.name')->title('Bahagian/Unit'),
-            Column::make('payment')->title('Bayaran'),
-            Column::make('payment_date')->title('Tarikh Bayaran'),
-            // Column::make('created_at')->title('Dicipta pada'),
+            Column::make('is_approve')->title('Status'),
+            Column::make('created_at')->title('Dicipta pada'),
         ];
     }
 
@@ -112,6 +126,6 @@ class PaidApplicationDataTable extends DataTable
      */
     protected function filename()
     {
-        return 'PermohonanTelahDibayar_' . date('YmdHis');
+        return 'PermohonanTidakDisokong_' . date('YmdHis');
     }
 }

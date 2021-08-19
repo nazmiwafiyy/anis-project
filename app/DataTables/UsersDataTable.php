@@ -23,8 +23,14 @@ class UsersDataTable extends DataTable
     public function dataTable($query)
     {
         return datatables()
-            ->eloquent($query);
+            ->eloquent($query)
             // ->addColumn('action', 'usersdatatable.action');
+            ->editColumn('roles.id', function(User $user){  
+                return $user->roles->map(function($role) {
+                    return $role->display_name;
+                })->implode(',');
+            });
+            // roles[, ].display_name
     }
 
     /**
@@ -36,7 +42,7 @@ class UsersDataTable extends DataTable
     public function query(User $model)
     {
         // return $model->newQuery();
-        return $model->newQuery()->with('profile','profile.department','profile.position')->select('users.*');
+        return $model->newQuery()->with('profile','profile.department','profile.position','roles')->select('users.*');
     }
 
     /**
@@ -82,9 +88,12 @@ class UsersDataTable extends DataTable
             Column::make('profile.fullname')->title('Nama Penuh'),
             Column::make('name')->title('Nama Pengguna'),
             Column::make('email')->title('E-mel'),
+            // Column::make('roles.display_name')->title('Peranan'),
+            // Column::make('roles.id')->data('roles[, ].display_name')->title('Peranan'),
+            Column::make('roles.id')->title('Peranan'),
             Column::make('profile.phone_no')->title('No. Telefon'),
-            Column::make('profile.position.name')->title('Jawatan'),
-            Column::make('profile.department.name')->title('Bahagian/Unit'),
+            Column::make('profile.position.id')->data('profile.position.name')->title('Jawatan'),
+            Column::make('profile.department.id')->data('profile.department.name')->title('Bahagian/Unit'),
             Column::make('created_at')->title('Dicipta pada'),
         ];
     }

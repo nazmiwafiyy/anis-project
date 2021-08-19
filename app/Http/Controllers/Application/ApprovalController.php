@@ -9,6 +9,7 @@ use App\Position;
 use App\Department;
 use App\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
 use App\Http\Controllers\Controller;
@@ -62,7 +63,7 @@ class ApprovalController extends Controller
                 })
                 ->addColumn('approval', function(Application $application){
                     $approvalCount = $application->approvals->where('status', 1)->count();
-                    $isRejected = $application->approvals->where('status', 0)->count() > 0 ? true : false;
+                    $isRejected = $application->is_approve == 'N' || $application->approvals->where('status', 0)->count() > 0 ? true : false;
                     if($isRejected){
                         $bgColor = 'bg-danger';
                         $status = 'Gagal';
@@ -102,7 +103,8 @@ class ApprovalController extends Controller
         return view('application.index',compact('html'));
     }
 
-    public function needAction(Request $request, Builder $builder){
+    public function needAction(Request $request, Builder $builder)
+    {
         $html = $builder->columns([
             ['data' => 'DT_RowIndex', 'name' => 'DT_RowIndex', 'title' => 'No','searchable' => false,'orderable' => false,],
             ['data' => 'fullname', 'name' => 'user.profile.fullname', 'title' => 'Nama','searchable' => true,'orderable' => true,],
@@ -134,7 +136,10 @@ class ApprovalController extends Controller
             $allNeedAction = [];
             foreach($application as $app){
                 $currentLevel = $app->currentApproveLevel();
-                if($userLevel == $currentLevel+1){
+                if(($userLevel == $currentLevel+1 && $currentLevel == 0 && Auth::user()->profile->department->id == $app->user->profile->department->id) || $userLevel == 99){
+                    $allNeedAction[] = $app->id;
+                }
+                elseif(($userLevel == $currentLevel+1 && $currentLevel > 0) || $userLevel == 99){
                     $allNeedAction[] = $app->id;
                 }
             }
@@ -151,7 +156,7 @@ class ApprovalController extends Controller
                 })
                 ->addColumn('approval', function(Application $application){
                     $approvalCount = $application->approvals->where('status', 1)->count();
-                    $isRejected = $application->approvals->where('status', 0)->count() > 0 ? true : false;
+                    $isRejected = $application->is_approve == 'N' || $application->approvals->where('status', 0)->count() > 0 ? true : false;
                     if($isRejected){
                         $bgColor = 'bg-danger';
                         $status = 'Gagal';

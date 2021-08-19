@@ -13,9 +13,14 @@ class Application extends Model
 {
     protected $guarded = ['id']; 
 
-    protected $casts = [
-        'created_at' => 'datetime:d-m-Y g:i A',
-    ];
+    // protected $casts = [
+    //     'created_at' => 'datetime:d-m-Y g:i A',
+    // ];
+
+    public function getCreatedAtAttribute()
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $this->attributes['created_at'],'UTC')->setTimezone('Asia/Kuala_Lumpur')->format('d-m-Y g:i A');
+    }
 
     public function getPaymentDateAttribute()
     {
@@ -45,7 +50,10 @@ class Application extends Model
     public function currentApproveLevel(){
         $current = 0;
         foreach($this->approvals as $approval){
-            if($approval->approved_by->hasPermissionTo('approval-head-department')){
+            if($approval->su_approval){
+                $current = $current < $approval->su_level ? $approval->su_level : $current;
+            }
+            elseif($approval->approved_by->hasPermissionTo('approval-head-department')){
                 $current = $current < 1 ? 1 : $current;
             }elseif($approval->approved_by->hasPermissionTo('approval-welfare-social-bureaus')){
                 $current = $current < 2 ? 2 : $current;

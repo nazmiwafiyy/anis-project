@@ -10,7 +10,7 @@
         <div class="float-md-right float-lg-right">
             @php
                 $approvalCount = $application->approvals->where('status', 1)->count();
-                $isRejected = $application->approvals->where('status', 0)->count() > 0 ? true : false;
+                $isRejected = $application->is_approve == 'N' || $application->approvals->where('status', 0)->count() > 0 ? true : false;
                 if($isRejected){
                     $textColor = 'text-danger';
                     $status = 'Gagal';
@@ -26,15 +26,22 @@
             @endphp
             @canany(['approval-head-department', 'approval-welfare-social-bureaus', 'approval-secretary-sports-welfare','approval-treasurer'])
             @if ($approvalCount < 4 && !$isRejected && $userLevel == $currentLevel+1)
-                @if (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()))
+                @if (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()) && $currentLevel == 0 && Auth::user()->profile->department->id == $application->user->profile->department->id)
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal"><i class="fas fa-fw fa-times"></i>Tolak Permohonan</button>
+                    <button type="button" class="btn btn-success btn-sm approveButton"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</button>
+                @elseif (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()) && $currentLevel > 0)
                     {{-- <a href="{{ route('application.reject',$application->id) }}" class="btn btn-danger btn-sm "><i class="fas fa-fw fa-times"></i>Tolak permohonan</a> --}}
                     <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal"><i class="fas fa-fw fa-times"></i>Tolak Permohonan</button>
                     @if ($userLevel == 4)
-                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</button>
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#approveModal"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</button>
                     @else
                         <button type="button" class="btn btn-success btn-sm approveButton"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan</button>
                     @endif
                 @endif
+            @endif
+            @if ($approvalCount < 4 && !$isRejected && $userLevel == 99)
+                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModalSu"><i class="fas fa-fw fa-times"></i>Tolak Permohonan(Super Admin)</button>
+                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#approveModalSu"><i class="fas fa-fw fa-check"></i>Luluskan Permohonan(Super Admin)</button>
             @endif
             @endcanany
             
@@ -46,81 +53,19 @@
 
 @section('content')
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form id="approveForm" method="POST" action="{{ route('application.approve',$application->id) }}" enctype="multipart/form-data">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Maklumat Pembayaran</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    </div>
-                    <div class="modal-body">
-                        {!! csrf_field() !!}
-                        {{-- <input type="hidden" name="id" value="{!! $application->id !!}" /> --}}
-                        <div class="form-group">
-                        <label for="payment" class="col-form-label">Jumlah bayaran</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text">RM</span>
-                            </div>
-                            <input name="payment" type="number" min="0" class="form-control" required>
-                        </div>
-                        </div>
-                        <div class="form-group">
-                        <label for="payment_date" class="col-form-label">Tarikh bayaran</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="far fa-calendar-alt"></i>
-                                </span>
-                            </div>
-                            <input class="form-control" placeholder="Tarikh bayaran" name="payment_date" type="text" id="payment_date" required>
-                            <span class="input-group-append">
-                                <button type="button" class="btn btn-default clear-payment-date">Hapus</button>
-                            </span>
-                        </div>
-                        </div>
-                        <label for="">Bukti bayaran</label>
-                        <div class="custom-file ">
-                            <label for="payment_prove" class="custom-file-label">
-                                    Bukti bayaran
-                            </label>
-                            <input name="payment_prove" type="file" class="custom-file-input form-control-sm" multiple="">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form method="POST" action="{{ route('application.reject',$application->id) }}" enctype="multipart/form-data">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title" id="rejectModalLabel">Sebab Penolakan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    </div>
-                    <div class="modal-body">
-                        {!! csrf_field() !!}
-                        {{-- <input type="hidden" name="id" value="{!! $application->id !!}" /> --}}
-                        <textarea name="reject_reason" class="form-control" rows="3" required></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    @canany(['approval-head-department', 'approval-welfare-social-bureaus', 'approval-secretary-sports-welfare','approval-treasurer'])
+    @if ($approvalCount < 4 && !$isRejected && $userLevel == $currentLevel+1)
+        @if (!in_array(Auth::user()->id,$application->approvals->pluck('user_id')->toArray()))
+            @include('application._approveModal')
+            @include('application._rejectModal')
+        @endif
+    @endif
+    @if ($approvalCount < 4 && !$isRejected && $userLevel == 99)
+        @include('application._approveModalSu')
+        @include('application._rejectModalSu') 
+    @endif
+    @endcanany
+
     <div class="row">
         <div class="col-12">
             <div class="callout callout-info">
@@ -134,22 +79,35 @@
                     <div class="timeline timeline-inverse">
                         @php
                             $totalApproved = 0; 
-                            $totalReject = 0;   
+                            $totalReject = 0; 
+                            // dd($application->approvals );
                         @endphp
                         @foreach ($application->approvals as $approval)
-                            @if($approval->approved_by->hasPermissionTo('approval-head-department'))
+                            @if($approval->approved_by->hasPermissionTo('approval-head-department') && !$approval->su_approval)
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
                                         <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
-                                        <h3 class="timeline-header">Kelulusan Ketua Jabatan</h3>
+                                        <h3 class="timeline-header">Perakuan Ketua Jabatan</h3>
                                     </div>
                                 </div>
                                 @php
                                     $approval->status == 1 ? $totalApproved++ : $totalReject++;
                                 @endphp
                             @endif
-                            @if($approval->approved_by->hasPermissionTo('approval-welfare-social-bureaus'))
+                            @if($approval->su_level == 1 && $approval->su_approval)
+                                <div>
+                                    <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
+                                        <h3 class="timeline-header">Perakuan Ketua Jabatan(Super Admin)</h3>
+                                    </div>
+                                </div>
+                                @php
+                                    $approval->status == 1 ? $totalApproved++ : $totalReject++;
+                                @endphp
+                            @endif
+                            @if($approval->approved_by->hasPermissionTo('approval-welfare-social-bureaus') && !$approval->su_approval)
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
@@ -160,8 +118,20 @@
                                 @php
                                     $approval->status == 1 ? $totalApproved++ : $totalReject++;   
                                 @endphp
+                            @endif
+                            @if($approval->su_level == 2 && $approval->su_approval)
+                                <div>
+                                    <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
+                                        <h3 class="timeline-header">Kelulusan Biro Kebajikan dan Sosial(Super Admin)</h3>
+                                    </div>
+                                </div>
+                                @php
+                                    $approval->status == 1 ? $totalApproved++ : $totalReject++;   
+                                @endphp
                             @endif     
-                            @if($approval->approved_by->hasPermissionTo('approval-secretary-sports-welfare'))
+                            @if($approval->approved_by->hasPermissionTo('approval-secretary-sports-welfare') && !$approval->su_approval)
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
@@ -173,12 +143,36 @@
                                     $approval->status == 1 ? $totalApproved++ : $totalReject++;   
                                 @endphp
                             @endif
-                            @if($approval->approved_by->hasPermissionTo('approval-treasurer'))
+                            @if($approval->su_level == 3 && $approval->su_approval)
                                 <div>
                                     <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
                                     <div class="timeline-item">
                                         <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
-                                        <h3 class="timeline-header">Kelulusan Bendahari / Penolong Bendahari</h3>
+                                        <h3 class="timeline-header">Kelulusan Setiausaha / Penolong Setiausha Kelab Sukan dan Kebajikan JKMM(Super Admin)</h3>
+                                    </div>
+                                </div>
+                                @php
+                                    $approval->status == 1 ? $totalApproved++ : $totalReject++;   
+                                @endphp
+                            @endif
+                            @if($approval->approved_by->hasPermissionTo('approval-treasurer') && !$approval->su_approval)
+                                <div>
+                                    <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
+                                        <h3 class="timeline-header">Pengesahan Bendahari / Penolong Bendahari</h3>
+                                    </div>
+                                </div>
+                                @php
+                                    $approval->status == 1 ? $totalApproved++ : $totalReject++;    
+                                @endphp
+                            @endif 
+                            @if($approval->su_level == 4 && $approval->su_approval)
+                                <div>
+                                    <i class="{{ $approval->status == 1 ? 'fas fa-check bg-success' : 'fas fa-times bg-danger'}}"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> {{$approval->created_at}}</span>
+                                        <h3 class="timeline-header">Pengesahan Bendahari / Penolong Bendahari</h3>
                                     </div>
                                 </div>
                                 @php
@@ -187,7 +181,7 @@
                             @endif 
                         @endforeach
                         <div>
-                            @if ($totalReject > 0)
+                            @if ($totalReject > 0 || $isRejected)
                                 <i class="fas fa-times bg-danger"></i>
                             @elseif($totalApproved == 4)
                                 <i class="fas fa-check bg-success"></i>
@@ -350,6 +344,7 @@
         $(function() {          
             //Initialize custom-file-input
             bsCustomFileInput.init();
+            $('#payment').hide();
 
             $('#payment_date').daterangepicker({
                 autoUpdateInput: false,
@@ -366,11 +361,68 @@
                 $('#payment_date').val('');
             });
 
+            $('#payment_date_su').daterangepicker({
+                autoUpdateInput: false,
+                singleDatePicker: true,
+                drops: 'bottom',
+                locale: {
+                    format: 'YYYY-MM-DD',
+                }
+            }, function(date) {
+                $('#payment_date_su').val(date.format('YYYY-MM-DD'));
+            });
+
+            $('.clear-payment-date-su').click(function() {
+                $('#payment_date_su').val('');
+            });
+
             $('.approveButton').click( function() {
                 $('#approveForm').submit();
             });
-
             
+            $('#level-1').change(function () {
+                if($('#level-1').is(':checked')){
+
+                }else{
+                    $('#level-2').prop('checked', false).change();
+                }
+            });
+
+            $('#level-2').change(function () {
+                if($('#level-2').is(':checked')){
+                    $('#level-1').prop('checked', true).change();
+                }else{
+                    $('#level-3').prop('checked', false).change();
+                }
+            });
+
+            $('#level-3').change(function () {
+                if($('#level-3').is(':checked')){
+                    $('#level-2').prop('checked', true).change();
+                }else{
+                    $('#level-4').prop('checked', false).change();
+                }
+            });
+
+            $('#level-4').change(function () {
+                if($('#level-4').is(':checked')){
+                    $('#level-3').prop('checked', true).change();
+                    $('#payment').show();
+                    $('input[name=payment]').prop('required',true);
+                    $('input[name=payment_date]').prop('required',true);
+                }else{
+                    $('#payment').hide();
+                    $('input[name=payment]').prop('required',false);
+                    $('input[name=payment_date]').prop('required',false); 
+                }
+            });
         });
+
+        function validateForm() {
+            if( $('#approveFormSu input[type=checkbox]:checked').length == 0){
+                alert('Sila pilih jenis kelulusan.');
+                return false;
+            }
+        }
     </script>
 @stop
