@@ -68,7 +68,8 @@
         $.each(params, function(i, val) {
             // apply search params to datatable
             // table.column(i).search(val ? val : '', flase, false);//for LIKE search
-            table.column(i).search(val ? '\\b' + val + '\\b' : '', true, false);//for id search
+            // table.column(i).search(val ? '\\b' + val + '\\b' : '', true, false);//for id search
+            table.column(i).search(val ? '(^' + val + '$)' : '', true, false);//for id search
         });
         table.table().draw();
     });
