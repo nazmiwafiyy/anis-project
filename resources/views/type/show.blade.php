@@ -18,7 +18,7 @@
     <div class="row">
         <div class="col-12">
             <div class="callout callout-info">
-                DEPARTMENT: Department details.
+                PERKARA: Perincian jenis permohonan.
             </div>
             <div class="mb-2">
             </div>
